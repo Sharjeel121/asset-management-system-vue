@@ -7,7 +7,7 @@
             <el-icon v-if="!sidebarOpen"><Expand /></el-icon>
             <el-icon v-else><Fold /></el-icon>
           </button>
-          <h1>Asset Management System</h1>
+          <h1>AMS</h1>
         </div>
         <el-dropdown>
           <span class="user-dropdown">
