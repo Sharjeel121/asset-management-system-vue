@@ -1,0 +1,145 @@
+@import './base.css';
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-weight: normal;
+}
+
+a,
+.green {
+  text-decoration: none;
+  color: hsla(160, 100%, 37%, 1);
+  transition: 0.4s;
+  padding: 3px;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    display: flex;
+    place-items: center;
+  }
+
+  #app {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0 2rem;
+  }
+}
+
+:root {
+  --el-color-primary: #1976d2;
+  --el-color-primary-light-3: #42a5f5;
+  --el-color-primary-light-5: #90caf9;
+  --el-color-primary-light-7: #bbdefb;
+  --el-color-primary-light-8: #e3f2fd;
+  --el-color-primary-light-9: #f5f9ff;
+  --el-color-primary-dark-2: #1565c0;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+#app {
+  height: 100%;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Global transitions */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Card styles */
+.el-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+/* Table styles */
+.el-table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.el-table th {
+  background-color: #f5f7fa;
+  font-weight: 600;
+}
+
+/* Button styles */
+.el-button {
+  border-radius: 4px;
+}
+
+/* Form styles */
+.el-form-item__label {
+  font-weight: 500;
+}
+
+/* Dialog styles */
+.el-dialog {
+  border-radius: 8px;
+}
+
+.el-dialog__header {
+  padding: 20px;
+  border-bottom: 1px solid #ebeef5;
+}
+
+.el-dialog__body {
+  padding: 20px;
+}
+
+.el-dialog__footer {
+  padding: 20px;
+  border-top: 1px solid #ebeef5;
+}
+
+/* Input styles */
+.el-input__inner {
+  border-radius: 4px;
+}
+
+/* Loading spinner */
+.el-loading-spinner {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  padding: 20px;
+}
