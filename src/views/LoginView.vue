@@ -89,17 +89,28 @@ export default {
 
 <style scoped>
 .login-container {
-  height: 100vh;
+  min-height: 100vh;
+  width: 100vw;
   display: flex;
   justify-content: center;
   align-items: center;
   background: linear-gradient(135deg, #1976d2 0%, #64b5f6 100%);
+  overflow: hidden;
 }
 
 .login-card {
-  width: 400px;
+  width: 100%;
+  max-width: 400px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: #fff;
+}
+
+@media (max-width: 500px) {
+  .login-card {
+    max-width: 95vw;
+    padding: 16px 4px;
+  }
 }
 
 .card-header {

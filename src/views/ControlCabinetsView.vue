@@ -112,7 +112,28 @@ export default {
   data() {
     return {
       loading: false,
-      cabinets: [],
+      cabinets: [
+        {
+          id: 1,
+          cabinetId: 'CAB-001',
+          description: 'Main Control Cabinet',
+          width: 800,
+          height: 2000,
+          depth: 600,
+          supplier: 'CSI',
+          site: 'Paris Factory'
+        },
+        {
+          id: 2,
+          cabinetId: 'CAB-002',
+          description: 'Remote I/O Cabinet',
+          width: 600,
+          height: 1800,
+          depth: 500,
+          supplier: 'CLIENT',
+          site: 'Berlin Factory'
+        }
+      ],
       sites: ['Paris Factory', 'Berlin Factory', 'Lyon Distribution Center'],
       dialogVisible: false,
       isEdit: false,
@@ -220,7 +241,7 @@ export default {
     }
   },
   mounted() {
-    this.fetchCabinets()
+    // this.fetchCabinets()
   }
 }
 </script>

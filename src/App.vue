@@ -2,10 +2,16 @@
   <el-container class="app-container">
     <el-header v-if="isAuthenticated" class="app-header">
       <div class="header-content">
-        <h1>Asset Management System</h1>
+        <div class="header-left">
+          <button class="sidebar-toggle" @click="sidebarOpen = !sidebarOpen" v-if="isAuthenticated">
+            <el-icon v-if="!sidebarOpen"><Expand /></el-icon>
+            <el-icon v-else><Fold /></el-icon>
+          </button>
+          <h1>Asset Management System</h1>
+        </div>
         <el-dropdown>
           <span class="user-dropdown">
-            {{ currentUser?.firstName }} {{ currentUser?.lastName }}
+            {{ currentUser && currentUser.firstName }} {{ currentUser && currentUser.lastName }}
             <el-icon><arrow-down /></el-icon>
           </span>
           <template #dropdown>
@@ -18,7 +24,12 @@
     </el-header>
 
     <el-container>
-      <el-aside v-if="isAuthenticated" width="200px" class="app-sidebar">
+      <el-aside
+        v-show="isAuthenticated && (!isMobile || sidebarOpen)"
+        :class="['app-sidebar', { open: sidebarOpen && isMobile }]"
+        width="220px"
+        @click.self="sidebarOpen = false"
+      >
         <el-menu
           :default-active="activeMenu"
           class="sidebar-menu"
@@ -72,7 +83,6 @@
           </el-menu-item>
         </el-menu>
       </el-aside>
-
       <el-main>
         <router-view />
       </el-main>
@@ -87,7 +97,9 @@ export default {
   name: 'App',
   data() {
     return {
-      activeMenu: this.$route.path
+      activeMenu: this.$route.path,
+      sidebarOpen: false,
+      isMobile: false
     }
   },
   computed: {
@@ -109,14 +121,26 @@ export default {
       const authStore = useAuthStore()
       authStore.logout()
       window.location.href = '/'
+    },
+    handleResize() {
+      this.isMobile = window.innerWidth <= 900
+      if (!this.isMobile) this.sidebarOpen = false
     }
   },
   watch: {
     '$route.path': {
       handler(newPath) {
         this.activeMenu = newPath
+        if (this.isMobile) this.sidebarOpen = false
       }
     }
+  },
+  mounted() {
+    this.handleResize()
+    window.addEventListener('resize', this.handleResize)
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.handleResize)
   }
 }
 </script>
@@ -130,6 +154,7 @@ export default {
   background-color: #1976d2;
   color: white;
   padding: 0 20px;
+  z-index: 3;
 }
 
 .header-content {
@@ -137,6 +162,42 @@ export default {
   justify-content: space-between;
   align-items: center;
   height: 100%;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+@media (max-width: 900px) {
+  .app-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    z-index: 2;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+    background: #f5f7fa;
+    transition: transform 0.3s cubic-bezier(.7,.3,.3,1);
+    transform: translateX(-100%);
+    padding-top: 60px;
+    overflow-x: hidden;
+  }
+  .app-sidebar.open {
+    transform: translateX(0);
+  }
+  .sidebar-toggle {
+    display: inline-block;
+  }
 }
 
 .app-sidebar {
@@ -158,7 +219,7 @@ export default {
 }
 
 .el-main {
-  padding: 20px;
+  padding: 0px;
   background-color: #f5f7fa;
 }
 </style>

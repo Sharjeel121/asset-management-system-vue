@@ -1,65 +1,19 @@
 <template>
   <div class="home-container">
-    <h2>Dashboard</h2>
-    <el-row :gutter="20" class="stats-row">
-      <el-col :span="4">
+    <h2 class="mb-4">Dashboard</h2>
+    <el-row :gutter="18" class="stats-row">
+      <el-col
+        v-for="(stat, i) in statList"
+        :key="i"
+        :xs="24" :sm="12" :md="8" :lg="4" :xl="4"
+      >
         <el-card class="stat-card">
           <template #header>
             <div class="card-header">
-              <span>Total Clients</span>
+              <span>{{ stat.label }}</span>
             </div>
           </template>
-          <div class="stat-value">{{ stats.totalClients }}</div>
-        </el-card>
-      </el-col>
-      <el-col :span="4">
-        <el-card class="stat-card">
-          <template #header>
-            <div class="card-header">
-              <span>Total Sites</span>
-            </div>
-          </template>
-          <div class="stat-value">{{ stats.totalSites }}</div>
-        </el-card>
-      </el-col>
-      <el-col :span="4">
-        <el-card class="stat-card">
-          <template #header>
-            <div class="card-header">
-              <span>Total Projects</span>
-            </div>
-          </template>
-          <div class="stat-value">{{ stats.totalProjects }}</div>
-        </el-card>
-      </el-col>
-      <el-col :span="4">
-        <el-card class="stat-card">
-          <template #header>
-            <div class="card-header">
-              <span>Total Cabinets</span>
-            </div>
-          </template>
-          <div class="stat-value">{{ stats.totalCabinets }}</div>
-        </el-card>
-      </el-col>
-      <el-col :span="4">
-        <el-card class="stat-card">
-          <template #header>
-            <div class="card-header">
-              <span>Total Products</span>
-            </div>
-          </template>
-          <div class="stat-value">{{ stats.totalProducts }}</div>
-        </el-card>
-      </el-col>
-      <el-col :span="4">
-        <el-card class="stat-card">
-          <template #header>
-            <div class="card-header">
-              <span>Total Software</span>
-            </div>
-          </template>
-          <div class="stat-value">{{ stats.totalSoftware }}</div>
+          <div class="stat-value">{{ stat.value }}</div>
         </el-card>
       </el-col>
     </el-row>
@@ -88,14 +42,14 @@ export default {
   name: 'HomeView',
   data() {
     return {
-      stats: {
-        totalClients: 24,
-        totalSites: 42,
-        totalProjects: 156,
-        totalCabinets: 310,
-        totalProducts: 2945,
-        totalSoftware: 523
-      },
+      statList: [
+        { label: 'Total Clients', value: 24 },
+        { label: 'Total Sites', value: 42 },
+        { label: 'Total Projects', value: 156 },
+        { label: 'Total Cabinets', value: 310 },
+        { label: 'Total Products', value: 2945 },
+        { label: 'Total Software', value: 523 }
+      ],
       recentActivities: [
         {
           description: 'New cabinet added at Site XYZ',
@@ -121,34 +75,53 @@ export default {
 }
 
 .stats-row {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .stat-card {
-  height: 120px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  border: none;
+  box-shadow: 0 2px 12px 0 rgba(25, 118, 210, 0.10);
+  border-radius: 14px;
+  background: #fff;
+  transition: box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 24px 0 rgba(25, 118, 210, 0.18);
 }
 
 .card-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #333;
 }
 
 .stat-value {
-  font-size: 32px;
-  font-weight: bold;
+  font-size: 2.1rem;
+  font-weight: 700;
   color: #1976d2;
   text-align: center;
-  margin-top: 10px;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 900px) {
+  .stat-card {
+    width: 100%;
+    min-width: unset;
+  }
 }
 
 .recent-activity-row {
   margin-top: 30px;
 }
+
 
 .recent-activity-list {
   list-style: none;

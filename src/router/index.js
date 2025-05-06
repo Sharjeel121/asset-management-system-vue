@@ -50,12 +50,12 @@ const router = createRouter({
       component: () => import('../views/ComputerWorkstationsView.vue'),
       meta: { requiresAuth: true }
     },
-    // {
-    //   path: '/automation-products',
-    //   name: 'automation-products',
-    //   component: () => import('../views/AutomationProductsView.vue'),
-    //   meta: { requiresAuth: true }
-    // },
+    {
+      path: '/automation-products',
+      name: 'automation-products',
+      component: () => import('../views/AutomationProductsView.vue'),
+      meta: { requiresAuth: true }
+    },
     {
       path: '/software',
       name: 'software',

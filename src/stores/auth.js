@@ -28,7 +28,7 @@ export const useAuthStore = defineStore('auth', {
               id: 1,
               firstName: 'Admin',
               lastName: 'User',
-              email: 'admin@example.com',
+              loginId: 'admin@example.com',
               role: 'Admin',
               permissions: [
                 'all',
@@ -48,7 +48,7 @@ export const useAuthStore = defineStore('auth', {
               id: 2,
               firstName: 'Company',
               lastName: 'User',
-              email: 'company@example.com',
+              loginId: 'company@example.com',
               role: 'Company',
               companyId: 1,
               permissions: [
@@ -95,7 +95,7 @@ export const useAuthStore = defineStore('auth', {
           }
         }
 
-        const response = users[credentials.email] || null
+        const response = users[credentials.loginId] || null
 
         if (!response) {
           throw new Error('Invalid credentials')
