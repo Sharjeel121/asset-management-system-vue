@@ -5,23 +5,23 @@
         <el-icon><plus /></el-icon>
         New Workstation
       </el-button>
-      <el-input v-model="search" placeholder="Search..." size="small" class="search-input" clearable />
+      <el-input v-model="search" placeholder="Search..." size="medium" class="search-input" clearable />
     </div>
     <el-card class="workstations-card">
       <el-table :data="pagedWorkstations" style="width: 100%" v-loading="loading">
-        <el-table-column prop="workstationId" label="Workstation ID" />
-        <el-table-column prop="description" label="Description" />
-        <el-table-column prop="type" label="Type" />
-        <el-table-column prop="processor" label="Processor" />
-        <el-table-column prop="ram" label="RAM (GB)" />
-        <el-table-column prop="os" label="Operating System" />
-        <el-table-column prop="manufacturer" label="Manufacturer" />
-        <el-table-column prop="model" label="Model" />
-        <el-table-column prop="year" label="Year" />
-        <el-table-column prop="formFactor" label="Form Factor" />
-        <el-table-column prop="supplier" label="Supplier" />
-        <el-table-column prop="site" label="Production Site" />
-        <el-table-column label="Actions" width="180">
+        <el-table-column prop="workstationId" label="Workstation ID" min-width="100" />
+        <el-table-column prop="description" label="Description" min-width="180" />
+        <el-table-column prop="type" label="Type" min-width="100" />
+        <el-table-column prop="processor" label="Processor" min-width="100" />
+        <el-table-column prop="ram" label="RAM (GB)" min-width="100" />
+        <el-table-column prop="os" label="Operating System" min-width="100" />
+        <el-table-column prop="manufacturer" label="Manufacturer" min-width="120" />
+        <el-table-column prop="model" label="Model" min-width="100" />
+        <el-table-column prop="year" label="Year" min-width="60" />
+        <el-table-column prop="formFactor" label="Form Factor" min-width="100" />
+        <el-table-column prop="supplier" label="Supplier" min-width="100" />
+        <el-table-column prop="site" label="Production Site" min-width="130" />
+        <el-table-column label="Actions" min-width="130">
           <template #default="scope">
             <el-button-group>
               <el-button size="small" @click="showEditDialog(scope.row)">Edit</el-button>
@@ -243,6 +243,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  gap: 10px;
 }
 .search-input {
   width: 200px;

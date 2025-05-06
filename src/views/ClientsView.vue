@@ -11,10 +11,10 @@
           Export
         </el-button>
       </div>
-      <div class="right-actions">
-        <el-input v-model="search" placeholder="Search..." size="small" class="search-input" clearable />
+      <div class="right-actions ">
+        <el-input v-model="search" placeholder="Search..." size="medium" class="search-input" clearable />
         <el-dropdown>
-          <el-button size="small">
+          <el-button size="medium">
             Filter <el-icon><arrow-down /></el-icon>
           </el-button>
           <template #dropdown>
@@ -36,14 +36,14 @@
         v-loading="loading"
       >
         <el-table-column type="index" label="#" width="50" />
-        <el-table-column prop="name" label="Client Name" />
-        <el-table-column prop="address" label="Headquarters Address" />
+        <el-table-column prop="name" label="Client Name" min-width="130" />
+        <el-table-column prop="address" label="Headquarters Address" min-width="150" />
         <el-table-column prop="city" label="City" />
         <el-table-column prop="country" label="Country" />
-        <el-table-column prop="phone" label="Phone Number" />
-        <el-table-column prop="contactPerson" label="Contact Name" />
-        <el-table-column prop="contactEmail" label="Contact Email" />
-        <el-table-column prop="contactPhone" label="Contact Phone" />
+        <el-table-column prop="phone" label="Phone Number" min-width="130" />
+        <el-table-column prop="contactPerson" label="Contact Name" min-width="130" />
+        <el-table-column prop="contactEmail" label="Contact Email" min-width="130" />
+        <el-table-column prop="contactPhone" label="Contact Phone" min-width="130" />
         <el-table-column label="Actions" width="180">
           <template #default="scope">
             <el-button-group>
@@ -289,6 +289,8 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 .left-actions {
   display: flex;

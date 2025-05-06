@@ -5,7 +5,7 @@
       <el-col
         v-for="(stat, i) in statList"
         :key="i"
-        :xs="24" :sm="12" :md="8" :lg="4" :xl="4"
+        :xs="12" :sm="12" :md="8" :lg="4" :xl="4"
       >
         <el-card class="stat-card">
           <template #header>
@@ -28,7 +28,7 @@
           </template>
           <ul class="recent-activity-list">
             <li v-for="(activity, index) in recentActivities" :key="index">
-              - {{ activity.description }} ({{ activity.timeAgo }})
+             - {{ activity.description }} ({{ activity.timeAgo }})
             </li>
           </ul>
         </el-card>

@@ -6,7 +6,7 @@
         <el-icon><plus /></el-icon>
         Add New Project
       </el-button>
-      <el-input v-model="search" placeholder="Search..." size="small" class="search-input" clearable />
+      <el-input v-model="search" placeholder="Search..." size="medium" class="search-input" clearable />
     </div>
 
     <el-card class="projects-card">
@@ -15,13 +15,13 @@
         style="width: 100%"
         v-loading="loading"
       >
-        <el-table-column prop="number" label="Project Number" />
-        <el-table-column prop="description" label="Description" />
-        <el-table-column prop="purchaseOrderDate" label="Purchase Order Date" />
-        <el-table-column prop="commissioningDate" label="Commissioning Date" />
-        <el-table-column prop="client" label="Client" />
-        <el-table-column prop="site" label="Production Site" />
-        <el-table-column label="Actions" width="180">
+        <el-table-column prop="number" label="Project Number" min-width="130" />
+        <el-table-column prop="description" label="Description" min-width="180" />
+        <el-table-column prop="purchaseOrderDate" label="Purchase Order Date" min-width="130" />
+        <el-table-column prop="commissioningDate" label="Commissioning Date" min-width="130" />
+        <el-table-column prop="client" label="Client" min-width="130" />
+        <el-table-column prop="site" label="Production Site" min-width="130" />
+        <el-table-column label="Actions" min-width="130">
           <template #default="scope">
             <el-button-group>
               <el-button
@@ -259,6 +259,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
 .projects-card {

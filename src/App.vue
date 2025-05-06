@@ -197,6 +197,7 @@ export default {
   }
   .sidebar-toggle {
     display: inline-block;
+    color: white;
   }
 }
 

@@ -37,9 +37,9 @@
 
     <el-card class="reports-card">
       <el-table :data="pagedData" style="width: 100%" v-loading="loading">
-        <el-table-column prop="manufacturer" label="Manufacturer" />
-        <el-table-column prop="reference" label="Reference" />
-        <el-table-column prop="description" label="Description" />
+        <el-table-column prop="manufacturer" label="Manufacturer" min-width="130" />
+        <el-table-column prop="reference" label="Reference" min-width="130"/>
+        <el-table-column prop="description" label="Description" min-width="130"/>
         <el-table-column prop="lifecycle" label="Lifecycle" />
         <el-table-column prop="totalQty" label="Total Qty." width="100" />
       </el-table>
@@ -143,16 +143,27 @@ export default {
   justify-content: space-between;
   align-items: flex-end;
   margin-bottom: 16px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 .left-actions {
   display: flex;
   gap: 10px;
   align-items: center;
+  flex-wrap: wrap;
+  
+  .el-button+.el-button {
+    margin-left: 0px;
+  }
 }
 .right-actions {
   display: flex;
   gap: 10px;
   align-items: center;
+  flex-wrap: wrap;
+  span{
+    color: black;
+  }
 }
 .report-type-select {
   width: 180px;

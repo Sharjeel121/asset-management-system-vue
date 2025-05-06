@@ -5,18 +5,18 @@
         <el-icon><plus /></el-icon>
         New Manufacturer
       </el-button>
-      <el-input v-model="search" placeholder="Search..." size="small" class="search-input" clearable />
+      <el-input v-model="search" placeholder="Search..." size="medium" class="search-input" clearable />
     </div>
     <el-card class="manufacturers-card">
       <el-table :data="pagedManufacturers" style="width: 100%" v-loading="loading">
-        <el-table-column prop="name" label="Name" />
-        <el-table-column prop="address" label="Headquarters Address" />
-        <el-table-column prop="country" label="Country" />
-        <el-table-column prop="productRange" label="Product Range" />
-        <el-table-column prop="contact" label="Contact" />
-        <el-table-column prop="email" label="Email" />
-        <el-table-column prop="phone" label="Phone" />
-        <el-table-column label="Actions" width="180">
+        <el-table-column prop="name" label="Name" min-width="120" />
+        <el-table-column prop="address" label="Headquarters Address" min-width="180" />
+        <el-table-column prop="country" label="Country" min-width="80" />
+        <el-table-column prop="productRange" label="Product Range" min-width="130" />
+        <el-table-column prop="contact" label="Contact" min-width="130" />
+        <el-table-column prop="email" label="Email" min-width="130" />
+        <el-table-column prop="phone" label="Phone" min-width="130" />
+        <el-table-column label="Actions" min-width="130">
           <template #default="scope">
             <el-button-group>
               <el-button size="small" @click="showEditDialog(scope.row)">Edit</el-button>
@@ -199,6 +199,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  gap: 10px;
 }
 .search-input {
   width: 200px;

@@ -5,18 +5,18 @@
         <el-icon><plus /></el-icon>
         New Software
       </el-button>
-      <el-input v-model="search" placeholder="Search..." size="small" class="search-input" clearable />
+      <el-input v-model="search" placeholder="Search..." size="medium" class="search-input" clearable />
     </div>
     <el-card class="software-card">
       <el-table :data="pagedSoftware" style="width: 100%" v-loading="loading">
-        <el-table-column prop="name" label="Name" />
-        <el-table-column prop="manufacturer" label="Manufacturer" />
-        <el-table-column prop="function" label="Function" />
-        <el-table-column prop="license" label="License" />
-        <el-table-column prop="supplier" label="Supplier" />
-        <el-table-column prop="workstation" label="Workstation" />
+        <el-table-column prop="name" label="Name" min-width="130" />
+        <el-table-column prop="manufacturer" label="Manufacturer" min-width="120" />
+        <el-table-column prop="function" label="Function" min-width="100" />
+        <el-table-column prop="license" label="License" min-width="100" />
+        <el-table-column prop="supplier" label="Supplier" min-width="100" />
+        <el-table-column prop="workstation" label="Workstation" min-width="100" />
         <el-table-column prop="site" label="Site" />
-        <el-table-column label="Actions" width="180">
+        <el-table-column label="Actions" min-width="130">
           <template #default="scope">
             <el-button-group>
               <el-button size="small" @click="showEditDialog(scope.row)">Edit</el-button>
@@ -228,9 +228,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
-}
-.search-input {
-  width: 200px;
+  gap: 10px;
 }
 .software-card {
   margin-top: 0;

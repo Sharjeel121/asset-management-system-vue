@@ -2,11 +2,13 @@
   <div class="cabinets-container">
     <div class="header-actions">
       <h2>Control Cabinets Management</h2>
-      <el-button type="primary" @click="showAddDialog">
-        <el-icon><plus /></el-icon>
-        Add New Cabinet
-      </el-button>
-      <el-input v-model="search" placeholder="Search..." size="small" class="search-input" clearable />
+      <div style="display: flex;gap: 10px;">
+        <el-button type="primary" @click="showAddDialog">
+          <el-icon><plus /></el-icon>
+          Add New Cabinet
+        </el-button>
+        <el-input v-model="search" placeholder="Search..." size="medium" class="search-input" clearable />
+      </div>
     </div>
 
     <el-card class="cabinets-card">
@@ -15,14 +17,14 @@
         style="width: 100%"
         v-loading="loading"
       >
-        <el-table-column prop="cabinetId" label="Cabinet ID" />
-        <el-table-column prop="description" label="Description" />
-        <el-table-column prop="width" label="Width (mm)" />
-        <el-table-column prop="height" label="Height (mm)" />
-        <el-table-column prop="depth" label="Depth (mm)" />
-        <el-table-column prop="supplier" label="Supplier" />
-        <el-table-column prop="site" label="Production Site" />
-        <el-table-column label="Actions" width="180">
+        <el-table-column prop="cabinetId" label="Cabinet ID" min-width="100" />
+        <el-table-column prop="description" label="Description" min-width="180" />
+        <el-table-column prop="width" label="Width (mm)" min-width="100" />
+        <el-table-column prop="height" label="Height (mm)" min-width="110" />
+        <el-table-column prop="depth" label="Depth (mm)" min-width="100" />
+        <el-table-column prop="supplier" label="Supplier" min-width="100" />
+        <el-table-column prop="site" label="Production Site" min-width="150" />
+        <el-table-column label="Actions" min-width="130">
           <template #default="scope">
             <el-button-group>
               <el-button
@@ -256,6 +258,8 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .search-input {

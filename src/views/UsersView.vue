@@ -9,17 +9,17 @@
       </template>
 
       <el-table :data="users" v-loading="loading" style="width: 100%">
-        <el-table-column prop="firstName" label="First Name" />
-        <el-table-column prop="lastName" label="Last Name" />
-        <el-table-column prop="loginId" label="Login ID" />
-        <el-table-column prop="role" label="Role">
+        <el-table-column prop="firstName" label="First Name" min-width="100" />
+        <el-table-column prop="lastName" label="Last Name" min-width="100" />
+        <el-table-column prop="loginId" label="Login ID" min-width="80" />
+        <el-table-column prop="role" label="Role" min-width="120">
           <template #default="{ row }">
             <el-tag :type="row.role === 'Administrator' ? 'danger' : 'info'">
               {{ row.role }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" label="Created At">
+        <el-table-column prop="createdAt" label="Created At" min-width="100">
           <template #default="{ row }">
             {{ new Date(row.createdAt).toLocaleDateString() }}
           </template>

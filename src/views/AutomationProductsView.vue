@@ -5,19 +5,19 @@
         <el-icon><plus /></el-icon>
         New Product
       </el-button>
-      <el-input v-model="search" placeholder="Search..." size="small" class="search-input" clearable />
+      <el-input v-model="search" placeholder="Search..." size="medium" class="search-input" clearable />
     </div>
     <el-card class="products-card">
       <el-table :data="pagedProducts" style="width: 100%" v-loading="loading">
-        <el-table-column prop="description" label="Description" />
-        <el-table-column prop="manufacturer" label="Manufacturer" />
-        <el-table-column prop="reference" label="Reference Number" />
-        <el-table-column prop="quantity" label="Quantity" width="100" />
+        <el-table-column prop="description" label="Description" min-width="130" />
+        <el-table-column prop="manufacturer" label="Manufacturer" min-width="120" />
+        <el-table-column prop="reference" label="Reference Number" min-width="130" />
+        <el-table-column prop="quantity" label="Quantity" min-width="100" />
         <el-table-column prop="function" label="Function" />
         <el-table-column prop="lifecycle" label="Lifecycle Stage" />
         <el-table-column prop="supplier" label="Supplier" />
         <el-table-column prop="cabinet" label="Control Cabinet" />
-        <el-table-column label="Actions" width="180">
+        <el-table-column label="Actions" min-width="130">
           <template #default="scope">
             <el-button-group>
               <el-button size="small" @click="showEditDialog(scope.row)">Edit</el-button>
@@ -224,10 +224,9 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  gap: 10px;
 }
-.search-input {
-  width: 200px;
-}
+
 .products-card {
   margin-top: 0;
 }
