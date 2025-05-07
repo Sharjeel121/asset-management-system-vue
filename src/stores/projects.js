@@ -24,26 +24,20 @@ export const useProjectsStore = defineStore('projects', {
         // TODO: Replace with actual API call
         this.projects = [
           {
-            id: 1,
-            clientId: 1,
-            name: 'Factory Automation Upgrade',
-            description: 'Upgrade of production line automation systems',
-            status: 'In Progress',
-            startDate: '2024-01-15',
-            endDate: '2024-06-30',
-            budget: 250000,
-            priority: 'High'
+            number: "PRJ-1001",
+            description: "Solar panel installation",
+            purchaseOrderDate: "2024-01-15",
+            commissioningDate: "2024-05-20",
+            client: "GreenTech Ltd.",
+            site: "Solar Farm Alpha, California"
           },
           {
-            id: 2,
-            clientId: 2,
-            name: 'SCADA System Implementation',
-            description: 'Implementation of new SCADA system for process monitoring',
-            status: 'Planning',
-            startDate: '2024-03-01',
-            endDate: '2024-08-31',
-            budget: 180000,
-            priority: 'Medium'
+            number: "PRJ-1002",
+            description: "HVAC system upgrade",
+            purchaseOrderDate: "2024-02-28",
+            commissioningDate: "2024-06-10",
+            client: "CoolAir Inc.",
+            site: "Factory B, New Jersey"
           }
         ]
       } catch (error) {
