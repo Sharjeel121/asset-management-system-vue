@@ -1,7 +1,9 @@
 <template>
   <div class="clients-container">
+
     <div class="header-actions">
       <div class="left-actions">
+        
         <el-button type="primary" @click="showAddDialog">
           <el-icon><plus /></el-icon>
           New Client
@@ -83,11 +85,13 @@
         <el-form-item label="Headquarters Address" prop="address">
           <el-input v-model="clientForm.address" />
         </el-form-item>
-        <el-form-item label="City" prop="city">
-          <el-input v-model="clientForm.city" />
-        </el-form-item>
         <el-form-item label="Country" prop="country">
-          <el-input v-model="clientForm.country" />
+          <!-- <el-input v-model="clientForm.country" /> -->
+          <country-select class="custom-select" v-model="clientForm.country" :country="clientForm.country" topCountry="US" />        
+        </el-form-item>
+        <el-form-item label="City" prop="city">
+          <!-- <el-input v-model="clientForm.city" /> -->
+          <region-select class="custom-select" v-model="clientForm.city" :country="clientForm.country" :region="region" />
         </el-form-item>
         <el-form-item label="Phone Number" prop="phone">
           <el-input v-model="clientForm.phone" />
@@ -111,6 +115,8 @@
         </span>
       </template>
     </el-dialog>
+  
+ 
   </div>
 </template>
 
@@ -280,6 +286,12 @@ export default {
 </script>
 
 <style scoped>
+.custom-select{
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  border-color: #dcdfe6;
+}
 .clients-container {
   padding: 20px;
 }
