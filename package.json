@@ -1,5 +1,5 @@
 {
-  "name": "csi-installed-base",
+  "name": "asset-management-system-vue",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -10,11 +10,13 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
+    "axios": "^1.9.0",
     "element-plus": "^2.9.9",
     "pinia": "^3.0.2",
     "vue": "^3.5.13",
     "vue-router": "^4.5.1",
-    "vue3-country-region-select": "^1.0.0"
+    "vue3-country-region-select": "^1.0.0",
+    "vue3-toastify": "^0.2.8"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.3",

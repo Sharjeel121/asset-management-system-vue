@@ -50,7 +50,7 @@
 
 <script>
 import { useAuthStore } from '../stores/auth'
-
+import { toast } from 'vue3-toastify'
 export default {
   name: 'LoginView',
   data() {

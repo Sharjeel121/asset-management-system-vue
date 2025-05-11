@@ -11,7 +11,7 @@
         </div>
         <el-dropdown>
           <span class="user-dropdown">
-            {{ currentUser && currentUser.firstName }} {{ currentUser && currentUser.lastName }}
+            {{ currentUser && currentUser.first_name }} {{ currentUser && currentUser.last_name }}
             <el-icon><arrow-down /></el-icon>
           </span>
           <template #dropdown>
