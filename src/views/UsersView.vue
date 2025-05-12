@@ -9,19 +9,20 @@
       </template>
 
       <el-table :data="users" v-loading="loading" style="width: 100%">
-        <el-table-column prop="firstName" label="First Name" min-width="100" />
-        <el-table-column prop="lastName" label="Last Name" min-width="100" />
-        <el-table-column prop="loginId" label="Login ID" min-width="80" />
+        <el-table-column prop="first_name" label="First Name" min-width="100" />
+        <el-table-column prop="last_name" label="Last Name" min-width="100" />
+        <el-table-column prop="user_name" label="User Name" min-width="100" />
+        <el-table-column prop="email" label="Email" min-width="180" />
         <el-table-column prop="role" label="Role" min-width="120">
           <template #default="{ row }">
-            <el-tag :type="row.role === 'Administrator' ? 'danger' : 'info'">
+            <el-tag :type="row.role === 'administrator' ? 'success' : 'info'">
               {{ row.role }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" label="Created At" min-width="100">
+        <el-table-column prop="created_at" label="Created At" min-width="100">
           <template #default="{ row }">
-            {{ new Date(row.createdAt).toLocaleDateString() }}
+            {{ new Date(row.created_at).toLocaleDateString() }}
           </template>
         </el-table-column>
         <el-table-column label="Actions" width="150">
@@ -51,19 +52,25 @@
         :rules="rules"
         label-width="120px"
       >
-        <el-form-item label="First Name" prop="firstName">
-          <el-input v-model="form.firstName" />
+        <el-form-item label="First Name" prop="first_name">
+          <el-input v-model="form.first_name" />
         </el-form-item>
-        <el-form-item label="Last Name" prop="lastName">
-          <el-input v-model="form.lastName" />
+        <el-form-item label="Last Name" prop="last_name">
+          <el-input v-model="form.last_name" />
         </el-form-item>
-        <el-form-item label="Login ID" prop="loginId">
-          <el-input v-model="form.loginId" />
+        <el-form-item label="User Name" prop="user_name">
+          <el-input v-model="form.user_name" />
+        </el-form-item>
+        <el-form-item label="Email" prop="email">
+          <el-input v-model="form.email" />
+        </el-form-item>
+        <el-form-item label="Password" prop="password">
+          <el-input v-model="form.password" />
         </el-form-item>
         <el-form-item label="Role" prop="role">
           <el-select v-model="form.role" style="width: 100%">
-            <el-option label="Administrator" value="Administrator" />
-            <el-option label="Standard User" value="Standard User" />
+            <el-option label="Administrator" value="administrator" />
+            <el-option label="User" value="user" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -79,119 +86,141 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted } from 'vue'
+<script>
 import { useUsersStore } from '@/stores/users'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
-const usersStore = useUsersStore()
-const users = ref([])
-const loading = ref(false)
-const dialogVisible = ref(false)
-const formRef = ref(null)
-const isEdit = ref(false)
-const currentUserId = ref(null)
-
-const form = ref({
-  firstName: '',
-  lastName: '',
-  loginId: '',
-  role: 'Standard User'
-})
-
-const rules = {
-  firstName: [
-    { required: true, message: 'Please enter first name', trigger: 'blur' }
-  ],
-  lastName: [
-    { required: true, message: 'Please enter last name', trigger: 'blur' }
-  ],
-  loginId: [
-    { required: true, message: 'Please enter login ID', trigger: 'blur' }
-  ],
-  role: [
-    { required: true, message: 'Please select role', trigger: 'change' }
-  ]
-}
-
-const dialogTitle = computed(() => 
-  isEdit.value ? 'Edit User' : 'Add New User'
-)
-
-const fetchUsers = async () => {
-  loading.value = true
-  try {
-    await usersStore.fetchUsers()
-    users.value = usersStore.users
-  } catch (error) {
-    ElMessage.error('Failed to fetch users: ' + error.message)
-  } finally {
-    loading.value = false
-  }
-}
-
-const handleAdd = () => {
-  isEdit.value = false
-  currentUserId.value = null
-  form.value = {
-    firstName: '',
-    lastName: '',
-    loginId: '',
-    role: 'Standard User'
-  }
-  dialogVisible.value = true
-}
-
-const handleEdit = (row) => {
-  isEdit.value = true
-  currentUserId.value = row.id
-  form.value = { ...row }
-  dialogVisible.value = true
-}
-
-const handleDelete = async (row) => {
-  try {
-    await ElMessageBox.confirm(
-      'Are you sure you want to delete this user?',
-      'Warning',
-      {
-        confirmButtonText: 'Yes',
-        cancelButtonText: 'No',
-        type: 'warning'
-      }
-    )
-    await usersStore.deleteUser(row.id)
-    ElMessage.success('User deleted successfully')
-    fetchUsers()
-  } catch (error) {
-    if (error !== 'cancel') {
-      ElMessage.error('Failed to delete user: ' + error.message)
-    }
-  }
-}
-
-const handleSubmit = async () => {
-  if (!formRef.value) return
+export default {
+  name: 'UsersView',
   
-  try {
-    await formRef.value.validate()
-    if (isEdit.value) {
-      await usersStore.updateUser(currentUserId.value, form.value)
-      ElMessage.success('User updated successfully')
-    } else {
-      await usersStore.createUser(form.value)
-      ElMessage.success('User created successfully')
+  data() {
+    return {
+      users: [],
+      loading: false,
+      dialogVisible: false,
+      isEdit: false,
+      currentUserId: null,
+      form: {
+        first_name: '',
+        last_name: '',
+        user_name: '',
+        email: '',
+        role: '',
+        password: '',
+      },
+      rules: {
+        first_name: [
+          { required: true, message: 'Please enter first name', trigger: 'blur' }
+        ],
+        last_name: [
+          { required: true, message: 'Please enter last name', trigger: 'blur' }
+        ],
+        user_name: [
+          { required: true, message: 'Please enter user name', trigger: 'blur' }
+        ],
+        role: [
+          { required: true, message: 'Please select role', trigger: 'change' }
+        ],
+        email: [
+          { required: true, message: 'Please enter email', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: 'Please enter password', trigger: 'blur' }
+        ]
+      }
     }
-    dialogVisible.value = false
-    fetchUsers()
-  } catch (error) {
-    ElMessage.error('Failed to save user: ' + error.message)
+  },
+
+  computed: {
+    dialogTitle() {
+      return this.isEdit ? 'Edit User' : 'Add New User'
+    }
+  },
+
+  methods: {
+    async fetchUsers() {
+      this.loading = true
+      try {
+        const usersStore = useUsersStore()
+        await usersStore.fetchUsers()
+        this.users = usersStore.users
+      } catch (error) {
+        ElMessage.error('Failed to fetch users: ' + error.message)
+      } finally {
+        this.loading = false
+      }
+    },
+
+    handleAdd() {
+      this.isEdit = false
+      this.currentUserId = null
+      this.form = {
+        first_name: '',
+        last_name: '',
+        user_name: '',
+        role: '',
+        email: '',
+        password: ''
+      }
+      this.dialogVisible = true
+    },
+
+    handleEdit(row) {
+      this.isEdit = true
+      this.currentUserId = row.id
+      this.form = { ...row }
+      this.dialogVisible = true
+    },
+
+    async handleDelete(row) {
+      try {
+        await ElMessageBox.confirm(
+          'Are you sure you want to delete this user?',
+          'Warning',
+          {
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            type: 'warning'
+          }
+        )
+        const usersStore = useUsersStore()
+        await usersStore.deleteUser(row.id)
+        ElMessage.success('User deleted successfully')
+        // this.fetchUsers()
+      } catch (error) {
+        if (error !== 'cancel') {
+          ElMessage.error('Failed to delete user: ' + error.message)
+        }
+      }
+    },
+
+    async handleSubmit() {
+      if (!this.$refs.formRef) return
+      
+      try {
+        await this.$refs.formRef.validate()
+        const usersStore = useUsersStore()
+        
+        if (this.isEdit) {
+          await usersStore.updateUser(this.currentUserId, this.form)
+          ElMessage.success('User updated successfully')
+        } else {
+          // console.log("🚀 ~ handleSubmit ~ this.form:", this.form)
+          await usersStore.createUser(this.form)
+          ElMessage.success('User created successfully')
+        }
+        this.dialogVisible = false
+        // this.fetchUsers() //uncomment this
+      } catch (error) {
+        ElMessage.error('Failed to save user: ' + error.message)
+      }
+    }
+  },
+
+  mounted() {
+    this.fetchUsers()
   }
 }
-
-onMounted(() => {
-  fetchUsers()
-})
 </script>
 
 <style scoped>

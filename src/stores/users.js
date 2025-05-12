@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { useApiStore } from './api'
+import appRequest from '@/helpers/request'
 
 export const useUsersStore = defineStore('users', {
   state: () => ({
@@ -17,30 +17,13 @@ export const useUsersStore = defineStore('users', {
 
   actions: {
     async fetchUsers() {
-      const apiStore = useApiStore()
       this.loading = true
       this.error = null
-
       try {
-        // TODO: Replace with actual API call
-        this.users = [
-          {
-            id: 1,
-            firstName: 'Admin',
-            lastName: 'User',
-            loginId: 'admin',
-            role: 'Administrator',
-            createdAt: '2024-01-01'
-          },
-          {
-            id: 2,
-            firstName: 'Standard',
-            lastName: 'User',
-            loginId: 'user',
-            role: 'Standard User',
-            createdAt: '2024-01-02'
-          }
-        ]
+        let response = await appRequest.get('/users')
+        this.users = response.data
+        // console.log("🚀 ~ fetchUsers ~ response:", response)
+        
       } catch (error) {
         this.error = error.message
         throw error
@@ -50,17 +33,19 @@ export const useUsersStore = defineStore('users', {
     },
 
     async createUser(userData) {
-      const apiStore = useApiStore()
       this.loading = true
       this.error = null
 
       try {
         // TODO: Replace with actual API call
-        const newUser = {
+        let newUser = {
           id: this.users.length + 1,
           ...userData,
-          createdAt: new Date().toISOString()
+          created_at: new Date().toISOString()
         }
+
+        console.log("🚀 ~ createUser ~ newUser:", newUser)
+        let response = await appRequest.post('users',userData)
         this.users.push(newUser)
         return newUser
       } catch (error) {
@@ -72,12 +57,14 @@ export const useUsersStore = defineStore('users', {
     },
 
     async updateUser(id, userData) {
-      const apiStore = useApiStore()
       this.loading = true
       this.error = null
 
       try {
+        let body = userData
+        console.log("🚀 ~ updateUser ~ body:", body)
         // TODO: Replace with actual API call
+        let response = await appRequest.put(`/users/${id}`, body)
         const index = this.users.findIndex(user => user.id === id)
         if (index !== -1) {
           this.users[index] = { ...this.users[index], ...userData }
@@ -93,12 +80,12 @@ export const useUsersStore = defineStore('users', {
     },
 
     async deleteUser(id) {
-      const apiStore = useApiStore()
       this.loading = true
       this.error = null
 
       try {
         // TODO: Replace with actual API call
+        let response = await appRequest.delete(`users/${id}`)
         const index = this.users.findIndex(user => user.id === id)
         if (index !== -1) {
           this.users.splice(index, 1)
