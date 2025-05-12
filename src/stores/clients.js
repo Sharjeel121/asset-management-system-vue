@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { useApiStore } from './api'
+import appRequest from '@/helpers/request'
 
 export const useClientsStore = defineStore('clients', {
   state: () => ({
@@ -14,32 +14,12 @@ export const useClientsStore = defineStore('clients', {
 
   actions: {
     async fetchClients() {
-      const apiStore = useApiStore()
       this.loading = true
       this.error = null
 
       try {
-        // TODO: Replace with actual API call
-        this.clients = [
-          {
-            id: 1,
-            name: 'ABC Manufacturing',
-            industry: 'Automotive',
-            location: 'Detroit, MI',
-            contactPerson: 'John Smith',
-            email: 'john.smith@abcmfg.com',
-            phone: '(555) 123-4567'
-          },
-          {
-            id: 2,
-            name: 'XYZ Industries',
-            industry: 'Electronics',
-            location: 'San Jose, CA',
-            contactPerson: 'Jane Doe',
-            email: 'jane.doe@xyzind.com',
-            phone: '(555) 987-6543'
-          }
-        ]
+        let response = await appRequest.get('/clients')
+        this.clients = response.data
       } catch (error) {
         this.error = error.message
         throw error
@@ -49,7 +29,6 @@ export const useClientsStore = defineStore('clients', {
     },
 
     async createClient(clientData) {
-      const apiStore = useApiStore()
       this.loading = true
       this.error = null
 
@@ -59,6 +38,7 @@ export const useClientsStore = defineStore('clients', {
           id: this.clients.length + 1,
           ...clientData
         }
+        let response = await appRequest.post('/clients', clientData)
         this.clients.push(newClient)
         return newClient
       } catch (error) {
@@ -70,12 +50,12 @@ export const useClientsStore = defineStore('clients', {
     },
 
     async updateClient(id, clientData) {
-      const apiStore = useApiStore()
       this.loading = true
       this.error = null
 
       try {
         // TODO: Replace with actual API call
+        let response = await appRequest.put(`/clients/${id}`, clientData)
         const index = this.clients.findIndex(client => client.id === id)
         if (index !== -1) {
           this.clients[index] = { ...this.clients[index], ...clientData }
@@ -91,11 +71,11 @@ export const useClientsStore = defineStore('clients', {
     },
 
     async deleteClient(id) {
-      const apiStore = useApiStore()
       this.loading = true
       this.error = null
 
       try {
+        let response = await appRequest.delete(`/clients/${id}`)
         // TODO: Replace with actual API call
         const index = this.clients.findIndex(client => client.id === id)
         if (index !== -1) {

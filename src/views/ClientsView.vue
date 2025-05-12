@@ -15,7 +15,7 @@
       </div>
       <div class="right-actions ">
         <el-input v-model="search" placeholder="Search..." size="medium" class="search-input" clearable />
-        <el-dropdown>
+        <!-- <el-dropdown>
           <el-button size="medium">
             Filter <el-icon><arrow-down /></el-icon>
           </el-button>
@@ -27,7 +27,7 @@
               <el-dropdown-item>Italy</el-dropdown-item>
             </el-dropdown-menu>
           </template>
-        </el-dropdown>
+        </el-dropdown> -->
       </div>
     </div>
 
@@ -38,18 +38,18 @@
         v-loading="loading"
       >
         <el-table-column type="index" label="#" width="50" />
-        <el-table-column prop="name" label="Client Name" min-width="130" />
-        <el-table-column prop="address" label="Headquarters Address" min-width="150" />
+        <el-table-column prop="client_name" label="Client Name" min-width="130" />
+        <el-table-column prop="headquarters_address" label="Headquarters Address" min-width="150" />
         <el-table-column prop="city" label="City" />
         <el-table-column prop="country" label="Country" />
-        <el-table-column prop="phone" label="Phone Number" min-width="130" />
-        <el-table-column prop="contactPerson" label="Contact Name" min-width="130" />
-        <el-table-column prop="contactEmail" label="Contact Email" min-width="130" />
-        <el-table-column prop="contactPhone" label="Contact Phone" min-width="130" />
-        <el-table-column label="Actions" width="180">
+        <el-table-column prop="phone_number" label="Phone Number" min-width="130" />
+        <el-table-column prop="contact_person_name" label="Contact Name" min-width="130" />
+        <el-table-column prop="contact_person_email" label="Contact Email" min-width="130" />
+        <el-table-column prop="contact_person_phone_number" label="Contact Phone" min-width="130" />
+        <el-table-column label="Actions" width="140">
           <template #default="scope">
             <el-button-group>
-              <el-button size="small" @click="viewClient(scope.row)">View</el-button>
+              <!-- <el-button size="small" @click="viewClient(scope.row)">View</el-button> -->
               <el-button type="primary" size="small" @click="showEditDialog(scope.row)">Edit</el-button>
               <el-button type="danger" size="small" @click="confirmDelete(scope.row)">Delete</el-button>
             </el-button-group>
@@ -62,7 +62,7 @@
           layout="prev, pager, next"
           :total="filteredClients.length"
           :page-size="pageSize"
-          :current-page.sync="currentPage"
+          v-model:current-page="currentPage"
         />
       </div>
     </el-card>
@@ -79,31 +79,29 @@
         :rules="rules"
         label-width="140px"
       >
-        <el-form-item label="Client Name" prop="name">
-          <el-input v-model="clientForm.name" />
+        <el-form-item label="Client Name" prop="client_name">
+          <el-input v-model="clientForm.client_name" />
         </el-form-item>
-        <el-form-item label="Headquarters Address" prop="address">
-          <el-input v-model="clientForm.address" />
+        <el-form-item label="Headquarters Address" prop="headquarters_address">
+          <el-input v-model="clientForm.headquarters_address" />
         </el-form-item>
         <el-form-item label="Country" prop="country">
-          <!-- <el-input v-model="clientForm.country" /> -->
           <country-select class="custom-select" v-model="clientForm.country" :country="clientForm.country" topCountry="US" />        
         </el-form-item>
         <el-form-item label="City" prop="city">
-          <!-- <el-input v-model="clientForm.city" /> -->
-          <region-select class="custom-select" v-model="clientForm.city" :country="clientForm.country" :region="region" />
+          <region-select class="custom-select" v-model="clientForm.city" :country="clientForm.country" :region="clientForm.city" />
         </el-form-item>
-        <el-form-item label="Phone Number" prop="phone">
-          <el-input v-model="clientForm.phone" />
+        <el-form-item label="Phone Number" prop="phone_number">
+          <el-input v-model="clientForm.phone_number" />
         </el-form-item>
-        <el-form-item label="Contact Name" prop="contactPerson">
-          <el-input v-model="clientForm.contactPerson" />
+        <el-form-item label="Contact Name" prop="contact_person_name">
+          <el-input v-model="clientForm.contact_person_name" />
         </el-form-item>
-        <el-form-item label="Contact Email" prop="contactEmail">
-          <el-input v-model="clientForm.contactEmail" />
+        <el-form-item label="Contact Email" prop="contact_person_email">
+          <el-input v-model="clientForm.contact_person_email" />
         </el-form-item>
-        <el-form-item label="Contact Phone" prop="contactPhone">
-          <el-input v-model="clientForm.contactPhone" />
+        <el-form-item label="Contact Phone" prop="contact_person_phone_number">
+          <el-input v-model="clientForm.contact_person_phone_number" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -121,6 +119,9 @@
 </template>
 
 <script>
+import { useClientsStore } from '@/stores/clients'
+import { ElMessage, ElMessageBox } from 'element-plus'
+
 export default {
   name: 'ClientsView',
   data() {
@@ -129,21 +130,22 @@ export default {
       clients: [],
       dialogVisible: false,
       isEdit: false,
+      currentClientId: null,
       clientForm: {
-        name: '',
-        address: '',
+        client_name: '',
+        headquarters_address: '',
         city: '',
         country: '',
-        phone: '',
-        contactPerson: '',
-        contactEmail: '',
-        contactPhone: ''
+        phone_number: '',
+        contact_person_name: '',
+        contact_person_email: '',
+        contact_person_phone_number: ''
       },
       rules: {
-        name: [
+        client_name: [
           { required: true, message: 'Please enter client name', trigger: 'blur' }
         ],
-        address: [
+        headquarters_address: [
           { required: true, message: 'Please enter headquarters address', trigger: 'blur' }
         ],
         city: [
@@ -152,19 +154,19 @@ export default {
         country: [
           { required: true, message: 'Please enter country', trigger: 'blur' }
         ],
-        phone: [
+        phone_number: [
           { required: true, message: 'Please enter phone number', trigger: 'blur' }
         ],
-        contactPerson: [
-          { required: true, message: 'Please enter contact name', trigger: 'blur' }
-        ],
-        contactEmail: [
-          { required: true, message: 'Please enter contact email', trigger: 'blur' },
-          { type: 'email', message: 'Please enter valid email', trigger: 'blur' }
-        ],
-        contactPhone: [
-          { required: true, message: 'Please enter contact phone', trigger: 'blur' }
-        ]
+        // contact_person_name: [
+        //   { required: true, message: 'Please enter contact name', trigger: 'blur' }
+        // ],
+        // contact_person_email: [
+        //   { required: true, message: 'Please enter contact email', trigger: 'blur' },
+        //   { type: 'email', message: 'Please enter valid email', trigger: 'blur' }
+        // ],
+        // contact_person_phone_number: [
+        //   { required: true, message: 'Please enter contact phone', trigger: 'blur' }
+        // ]
       },
       search: '',
       currentPage: 1,
@@ -178,9 +180,9 @@ export default {
     filteredClients() {
       if (!this.search) return this.clients
       return this.clients.filter(client =>
-        client.name.toLowerCase().includes(this.search.toLowerCase()) ||
+        client.client_name.toLowerCase().includes(this.search.toLowerCase()) ||
         client.country.toLowerCase().includes(this.search.toLowerCase()) ||
-        client.contactPerson.toLowerCase().includes(this.search.toLowerCase())
+        (client.contact_person_name && client.contact_person_name.toLowerCase().includes(this.search.toLowerCase()))
       )
     },
     pagedClients() {
@@ -192,91 +194,82 @@ export default {
     async fetchClients() {
       this.loading = true
       try {
-        // TODO: Implement API call
-        this.clients = [
-          {
-            id: 1,
-            name: 'Acme Industries',
-            address: 'HQ 1, Paris',
-            city: 'Paris',
-            country: 'France',
-            phone: '+33 123 4567',
-            contactPerson: 'Jean Dupont',
-            contactEmail: 'jean@acme.com',
-            contactPhone: '+33 987 6543'
-          },
-          {
-            id: 2,
-            name: 'TechCorp Global',
-            address: 'HQ 2, Berlin',
-            city: 'Berlin',
-            country: 'Germany',
-            phone: '+49 123 4567',
-            contactPerson: 'Hans Müller',
-            contactEmail: 'hans@techcorp.com',
-            contactPhone: '+49 987 6543'
-          }
-        ]
+        const clientsStore = useClientsStore()
+        await clientsStore.fetchClients()
+        this.clients = clientsStore.clients
+      } catch (error) {
+        console.error('Failed to fetch clients: ' + error.message)
       } finally {
         this.loading = false
       }
     },
     showAddDialog() {
       this.isEdit = false
+      this.currentClientId = null
       this.clientForm = {
-        name: '',
-        address: '',
+        client_name: '',
+        headquarters_address: '',
         city: '',
         country: '',
-        phone: '',
-        contactPerson: '',
-        contactEmail: '',
-        contactPhone: ''
+        phone_number: '',
+        contact_person_name: '',
+        contact_person_email: '',
+        contact_person_phone_number: ''
       }
       this.dialogVisible = true
     },
     showEditDialog(client) {
       this.isEdit = true
+      this.currentClientId = client.id
       this.clientForm = { ...client }
       this.dialogVisible = true
     },
     viewClient(client) {
-      // TODO: Implement view client details
-      this.$message.info(`Viewing client: ${client.name}`)
+      ElMessage.info(`Viewing client: ${client.client_name}`)
     },
     exportClients() {
-      // TODO: Implement export functionality
-      this.$message.success('Exported clients!')
+      ElMessage.success('Exported clients!')
     },
     async handleSubmit() {
+      if (!this.$refs.clientForm) return
+      
       try {
         await this.$refs.clientForm.validate()
-        // TODO: Implement API call
+        const clientsStore = useClientsStore()
+        
         if (this.isEdit) {
-          // Update client
+          await clientsStore.updateClient(this.currentClientId, this.clientForm)
+          ElMessage.success('Client updated successfully')
         } else {
-          // Create new client
+          await clientsStore.createClient(this.clientForm)
+          ElMessage.success('Client created successfully')
         }
         this.dialogVisible = false
-        this.fetchClients()
+        // this.fetchClients()
       } catch (error) {
-        console.error('Form validation failed:', error)
+        console.error('Failed to save client: ' + error.message)
       }
     },
-    confirmDelete(client) {
-      this.$confirm(
-        'This will permanently delete the client. Continue?',
-        'Warning',
-        {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
-        }
-      ).then(() => {
-        // TODO: Implement delete
-        this.$message.success('Client deleted')
+    async confirmDelete(client) {
+      try {
+        await ElMessageBox.confirm(
+          'Are you sure you want to delete this client?',
+          'Warning',
+          {
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            type: 'warning'
+          }
+        )
+        const clientsStore = useClientsStore()
+        await clientsStore.deleteClient(client.id)
+        ElMessage.success('Client deleted successfully')
         this.fetchClients()
-      })
+      } catch (error) {
+        if (error !== 'cancel') {
+          console.error('Failed to delete client: ' + error.message)
+        }
+      }
     }
   },
   mounted() {
