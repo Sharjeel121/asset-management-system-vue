@@ -120,7 +120,7 @@ export default {
     logout() {
       const authStore = useAuthStore()
       authStore.logout()
-      window.location.href = '/'
+      // window.location.href = '/'
     },
     handleResize() {
       this.isMobile = window.innerWidth <= 900

@@ -1,19 +1,70 @@
 <template>
   <div class="home-container">
     <h2 class="mb-4">Dashboard</h2>
+    <!-- <p>
+      {{ statList }}
+    </p> -->
     <el-row :gutter="18" class="stats-row">
       <el-col
-        v-for="(stat, i) in statList"
-        :key="i"
         :xs="12" :sm="12" :md="8" :lg="4" :xl="4"
       >
         <el-card class="stat-card">
           <template #header>
             <div class="card-header">
-              <span>{{ stat.label }}</span>
+              <span> Total Clients</span>
             </div>
           </template>
-          <div class="stat-value">{{ stat.value }}</div>
+          <div class="stat-value"> {{statList?.clients || '-'}}</div>
+        </el-card>
+      </el-col>
+      <el-col :xs="12" :sm="12" :md="8" :lg="4" :xl="4" >
+        <el-card class="stat-card">
+          <template #header>
+            <div class="card-header">
+              <span>Total Sites </span>
+            </div>
+          </template>
+          <div class="stat-value">{{statList?.sides || '-'}}</div>
+        </el-card>
+      </el-col>
+      <el-col :xs="12" :sm="12" :md="8" :lg="4" :xl="4" >
+        <el-card class="stat-card">
+          <template #header>
+            <div class="card-header">
+              <span>Total Projects </span>
+            </div>
+          </template>
+          <div class="stat-value">{{statList?.projects || '-'}} </div>
+        </el-card>
+      </el-col>
+      <el-col :xs="12" :sm="12" :md="8" :lg="4" :xl="4" >
+        <el-card class="stat-card">
+          <template #header>
+            <div class="card-header">
+              <span>Total Cabinets </span>
+            </div>
+          </template>
+          <div class="stat-value">{{statList?.cabinets || '-'}}</div>
+        </el-card>
+      </el-col>
+      <el-col :xs="12" :sm="12" :md="8" :lg="4" :xl="4" >
+        <el-card class="stat-card">
+          <template #header>
+            <div class="card-header">
+              <span>Total Products </span>
+            </div>
+          </template>
+          <div class="stat-value">{{statList?.products || '-'}}</div>
+        </el-card>
+      </el-col>
+      <el-col :xs="12" :sm="12" :md="8" :lg="4" :xl="4" >
+        <el-card class="stat-card">
+          <template #header>
+            <div class="card-header">
+              <span>Total Software </span>
+            </div>
+          </template>
+          <div class="stat-value">{{statList?.software || '-'}}</div>
         </el-card>
       </el-col>
     </el-row>
@@ -26,9 +77,16 @@
               <span>Recent Activities</span>
             </div>
           </template>
-          <ul class="recent-activity-list">
-            <li v-for="(activity, index) in recentActivities" :key="index">
-             - {{ activity.description }} ({{ activity.timeAgo }})
+          <ul
+          v-loading="loading"
+          element-loading-text="Loading..."
+          :element-loading-spinner="svg"
+          class="recent-activity-list">
+            <li v-if="recentActivities.length" v-for="(item, index) in recentActivities" :key="index">
+             - {{ item?.activity }}
+            </li>
+            <li v-else>
+              - No activity yet
             </li>
           </ul>
         </el-card>
@@ -38,32 +96,40 @@
 </template>
 
 <script>
+import appRequest from '@/helpers/request'
+import {dashboardStore} from '../stores/dashboardStore'
 export default {
   name: 'HomeView',
   data() {
     return {
-      statList: [
-        { label: 'Total Clients', value: 24 },
-        { label: 'Total Sites', value: 42 },
-        { label: 'Total Projects', value: 156 },
-        { label: 'Total Cabinets', value: 310 },
-        { label: 'Total Products', value: 2945 },
-        { label: 'Total Software', value: 523 }
-      ],
+      loading: true,
+      dashboardStore: dashboardStore(),
+      statList: {},
       recentActivities: [
-        {
-          description: 'New cabinet added at Site XYZ',
-          timeAgo: '2 hours ago'
-        },
-        {
-          description: 'Software updated at Client ABC',
-          timeAgo: '1 day ago'
-        },
-        {
-          description: 'New project created for Client DEF',
-          timeAgo: '2 days ago'
-        }
       ]
+    }
+  },
+  async mounted(){
+    if (!this.dashboardStore.countData) {
+      await this.dashboardStore.getDashCount()
+    }
+    this.setCount()
+    this.setRecentAct()
+
+  },
+  methods: {  
+    setCount(){
+      this.statList = this.dashboardStore.countData
+    },
+    async setRecentAct(){
+      try {
+        const resp = await appRequest.get('/logs')
+        this.recentActivities = resp.data
+        this.loading= false
+      } catch (error) {
+          console.log(error);
+      };
+      
     }
   }
 }

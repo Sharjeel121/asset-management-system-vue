@@ -1,5 +1,6 @@
 import appRequest from '@/helpers/request'
 import { defineStore } from 'pinia'
+import { toast } from 'vue3-toastify'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -30,7 +31,7 @@ export const useAuthStore = defineStore('auth', {
               firstName: 'Admin',
               lastName: 'User',
               loginId: 'admin@example.com',
-              role: 'Admin',
+              role: 'administrator',
               companyId: null
             }
           },
@@ -41,7 +42,7 @@ export const useAuthStore = defineStore('auth', {
               firstName: 'Company',
               lastName: 'User',
               loginId: 'company@example.com',
-              role: 'Company',
+              role: 'user',
               companyId: 1
             }
           }
@@ -58,8 +59,8 @@ export const useAuthStore = defineStore('auth', {
         this.token = response.access_token
         this.currentUser = response.user
 
-        localStorage.setItem('token', response.token)
-        localStorage.setItem('currentUser', JSON.stringify(response.user))
+        localStorage.setItem('token', this.token)
+        localStorage.setItem('currentUser', JSON.stringify(this.currentUser))
         
         return true
       } catch (error) {
@@ -68,11 +69,20 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    logout() {
-      this.token = null
-      this.currentUser = null
-      localStorage.removeItem('token')
-      localStorage.removeItem('currentUser')
+    async logout() {
+      try{
+        const response = await appRequest.post('/logout')
+        // toast.success(response.message)
+        
+        this.token = null
+        this.currentUser = null
+        localStorage.removeItem('token')
+        localStorage.removeItem('currentUser')
+        window.location.href = '/'
+      } catch (error) {
+        console.error('Login failed:', error)
+        return false
+      }
     }
   }
 }) 
