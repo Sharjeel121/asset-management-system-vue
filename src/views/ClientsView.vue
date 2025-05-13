@@ -195,7 +195,9 @@ export default {
       this.loading = true
       try {
         const clientsStore = useClientsStore()
-        await clientsStore.fetchClients()
+        if (clientsStore.clients.length === 0){
+          await clientsStore.fetchClients()
+        }
         this.clients = clientsStore.clients
       } catch (error) {
         console.error('Failed to fetch clients: ' + error.message)

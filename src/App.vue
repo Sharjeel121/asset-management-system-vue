@@ -4,10 +4,11 @@
       <div class="header-content">
         <div class="header-left">
           <button class="sidebar-toggle" @click="sidebarOpen = !sidebarOpen" v-if="isAuthenticated">
-            <el-icon v-if="!sidebarOpen"><Expand /></el-icon>
-            <el-icon v-else><Fold /></el-icon>
+            <el-icon  v-if="!sidebarOpen"><Expand /></el-icon>
+            <el-icon  v-else><Fold /></el-icon>
           </button>
-          <h1>AMS</h1>
+          <!-- <h1>AMS</h1> -->
+           <img src="/public/logo.png" alt="AMS" height="50px" />
         </div>
         <el-dropdown>
           <span class="user-dropdown">
@@ -180,6 +181,7 @@ export default {
   border: none;
   cursor: pointer;
   margin-right: 10px;
+  font-size: 20px;
 }
 
 @media (max-width: 900px) {

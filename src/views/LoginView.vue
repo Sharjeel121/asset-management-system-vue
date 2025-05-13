@@ -1,9 +1,12 @@
 <template>
   <div class="login-container">
     <el-card class="login-card">
+      
       <template #header>
+        
         <div class="card-header">
-          <h2>Asset Management System</h2>
+          <img src="/public/logo.png" alt="AMS" height="100px" />
+          <!-- <h2>Asset Management System</h2> -->
           <p>Industrial Automation Asset Management</p>
         </div>
       </template>
@@ -15,10 +18,10 @@
         label-position="top"
         @submit.prevent="handleLogin"
       >
-        <el-form-item label="Login ID" prop="loginId">
+        <el-form-item label="User Name" prop="loginId">
           <el-input
             v-model="loginForm.loginId"
-            placeholder="Enter your login ID"
+            placeholder="Enter your user name"
             prefix-icon="user"
           />
         </el-form-item>

@@ -142,7 +142,9 @@ export default {
       this.loading = true
       try {
         const usersStore = useUsersStore()
-        await usersStore.fetchUsers()
+        if (usersStore.users.length === 0){
+          await usersStore.fetchUsers()
+        }
         this.users = usersStore.users
       } catch (error) {
         ElMessage.error('Failed to fetch users: ' + error.message)
