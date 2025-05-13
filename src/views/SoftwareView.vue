@@ -1,25 +1,35 @@
 <template>
   <div class="software-container">
     <div class="header-actions">
-      <el-button type="primary" @click="showAddDialog">
-        <el-icon><plus /></el-icon>
-        New Software
-      </el-button>
-      <el-input v-model="search" placeholder="Search..." size="medium" class="search-input" clearable />
+      <div class="left-actions">
+        <el-button type="primary" @click="showAddDialog">
+          <el-icon><plus /></el-icon>
+          Add New Software
+        </el-button>
+        <el-button @click="exportSoftware">
+          <el-icon><download /></el-icon>
+          Export
+        </el-button>
+      </div>
+      <div class="right-actions">
+        <el-input v-model="search" placeholder="Search..." size="medium" class="search-input" clearable />
+      </div>
     </div>
     <el-card class="software-card">
       <el-table :data="pagedSoftware" style="width: 100%" v-loading="loading">
-        <el-table-column prop="name" label="Name" min-width="130" />
-        <el-table-column prop="manufacturer" label="Manufacturer" min-width="120" />
-        <el-table-column prop="function" label="Function" min-width="100" />
-        <el-table-column prop="license" label="License" min-width="100" />
+        <el-table-column type="index" label="#" width="50" />
+        <el-table-column prop="software_name" label="Name" min-width="150" />
+        <el-table-column prop="manufacturer.manufacturer_name" label="Manufacturer" min-width="150" />
+        <el-table-column prop="function" label="Function" min-width="120" />
+        <el-table-column prop="license_version" label="License Version" min-width="120" />
+        <el-table-column prop="license_type" label="License Type" min-width="120" />
         <el-table-column prop="supplier" label="Supplier" min-width="100" />
-        <el-table-column prop="workstation" label="Workstation" min-width="100" />
-        <el-table-column prop="site" label="Site" />
-        <el-table-column label="Actions" min-width="130">
+        <el-table-column prop="computer_workstation.workstation_id" label="Workstation" min-width="120" />
+        <el-table-column prop="production_site.site_name" label="Site" min-width="150" />
+        <el-table-column label="Actions" width="140">
           <template #default="scope">
             <el-button-group>
-              <el-button size="small" @click="showEditDialog(scope.row)">Edit</el-button>
+              <el-button type="primary" size="small" @click="showEditDialog(scope.row)">Edit</el-button>
               <el-button type="danger" size="small" @click="confirmDelete(scope.row)">Delete</el-button>
             </el-button-group>
           </template>
@@ -31,19 +41,19 @@
           layout="prev, pager, next"
           :total="filteredSoftware.length"
           :page-size="pageSize"
-          :current-page.sync="currentPage"
+          v-model:current-page="currentPage"
         />
       </div>
     </el-card>
     <!-- Add/Edit Dialog -->
     <el-dialog :title="dialogTitle" v-model="dialogVisible" width="600px">
-      <el-form ref="softwareForm" :model="softwareForm" :rules="rules" label-width="140px">
-        <el-form-item label="Name" prop="name">
-          <el-input v-model="softwareForm.name" />
+      <el-form ref="softwareForm" :model="softwareForm" :rules="rules" label-width="170px">
+        <el-form-item label="Software Name" prop="software_name">
+          <el-input v-model="softwareForm.software_name" />
         </el-form-item>
-        <el-form-item label="Manufacturer" prop="manufacturer">
-          <el-select v-model="softwareForm.manufacturer" filterable placeholder="Select manufacturer">
-            <el-option v-for="m in manufacturers" :key="m" :label="m" :value="m" />
+        <el-form-item label="Manufacturer" prop="manufacturer_id">
+          <el-select v-model="softwareForm.manufacturer_id" filterable placeholder="Select manufacturer">
+            <el-option v-for="m in manufacturers" :key="m.id" :label="m.manufacturer_name" :value="m.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="Function" prop="function">
@@ -53,11 +63,20 @@
             <el-option label="PLC Programming" value="PLC Programming" />
             <el-option label="MES" value="MES" />
             <el-option label="Database" value="Database" />
+            <el-option label="Client Supervision" value="Client Supervision" />
             <el-option label="Other" value="Other" />
           </el-select>
         </el-form-item>
-        <el-form-item label="License" prop="license">
-          <el-input v-model="softwareForm.license" />
+        <el-form-item label="License Version" prop="license_version">
+          <el-input v-model="softwareForm.license_version" />
+        </el-form-item>
+        <el-form-item label="License Type" prop="license_type">
+          <el-select v-model="softwareForm.license_type" placeholder="Select license type">
+            <el-option label="Electronic" value="electronic" />
+            <el-option label="USB Dongle" value="usb_dongle" />
+            <el-option label="Paper" value="paper" />
+            <el-option label="Other" value="other" />
+          </el-select>
         </el-form-item>
         <el-form-item label="Supplier" prop="supplier">
           <el-select v-model="softwareForm.supplier" placeholder="Select supplier">
@@ -65,21 +84,23 @@
             <el-option label="CLIENT" value="CLIENT" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Workstation" prop="workstation">
-          <el-select v-model="softwareForm.workstation" filterable placeholder="Select workstation">
-            <el-option v-for="ws in workstations" :key="ws.workstationId" :label="ws.workstationId" :value="ws.workstationId" />
+        <el-form-item label="Computer Workstation" prop="computer_workstation_id">
+          <el-select v-model="softwareForm.computer_workstation_id" filterable placeholder="Select workstation">
+            <el-option v-for="ws in computerWorkstations" :key="ws.id" :label="ws.workstation_id" :value="ws.id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Site" prop="site">
-          <el-select v-model="softwareForm.site" filterable placeholder="Select site">
-            <el-option v-for="site in sites" :key="site" :label="site" :value="site" />
+        <el-form-item label="Production Site" prop="production_site_id">
+          <el-select v-model="softwareForm.production_site_id" filterable placeholder="Select site">
+            <el-option v-for="site in productionSites" :key="site.id" :label="site.site_name" :value="site.id" />
           </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">Cancel</el-button>
-          <el-button type="primary" @click="handleSubmit">{{ isEdit ? 'Update' : 'Create' }}</el-button>
+          <el-button type="primary" @click="handleSubmit">
+            {{ isEdit ? 'Update' : 'Create' }}
+          </el-button>
         </span>
       </template>
     </el-dialog>
@@ -87,34 +108,43 @@
 </template>
 
 <script>
+import { useSoftwareStore } from '@/stores/software'
+import { useManufacturersStore } from '@/stores/manufacturers'
+import { useProductionSitesStore } from '@/stores/productionSites'
+import { useComputerWorkstationsStore } from '@/stores/computerWorkstations'
+import { ElMessage, ElMessageBox } from 'element-plus'
+
 export default {
   name: 'SoftwareView',
   data() {
     return {
       loading: false,
-      software: [],
-      manufacturers: ['Siemens', 'Schneider', 'Allen-Bradley', 'Rockwell', 'SAP', 'Microsoft'],
-      workstations: [],
-      sites: ['Paris Factory', 'Berlin Factory', 'Lyon Distribution Center'],
+      softwareList: [], // Renamed to avoid conflict with store state name
+      manufacturers: [],
+      productionSites: [],
+      computerWorkstations: [],
       dialogVisible: false,
       isEdit: false,
+      currentSoftwareId: null,
       softwareForm: {
-        name: '',
-        manufacturer: '',
+        software_name: '',
+        manufacturer_id: '',
         function: '',
-        license: '',
+        license_version: '',
+        license_type: '',
         supplier: '',
-        workstation: '',
-        site: ''
+        computer_workstation_id: null, // Allow null
+        production_site_id: ''
       },
       rules: {
-        name: [{ required: true, message: 'Please enter name', trigger: 'blur' }],
-        manufacturer: [{ required: true, message: 'Please select manufacturer', trigger: 'change' }],
+        software_name: [{ required: true, message: 'Please enter software name', trigger: 'blur' }],
+        manufacturer_id: [{ required: true, message: 'Please select manufacturer', trigger: 'change' }],
         function: [{ required: true, message: 'Please select function', trigger: 'change' }],
-        license: [{ required: true, message: 'Please enter license', trigger: 'blur' }],
+        license_version: [{ required: true, message: 'Please enter license version', trigger: 'blur' }],
+        license_type: [{ required: true, message: 'Please select license type', trigger: 'change' }],
         supplier: [{ required: true, message: 'Please select supplier', trigger: 'change' }],
-        workstation: [{ required: true, message: 'Please select workstation', trigger: 'change' }],
-        site: [{ required: true, message: 'Please select site', trigger: 'change' }]
+        production_site_id: [{ required: true, message: 'Please select production site', trigger: 'change' }]
+        // computer_workstation_id can be optional
       },
       search: '',
       currentPage: 1,
@@ -126,11 +156,11 @@ export default {
       return this.isEdit ? 'Edit Software' : 'Add New Software'
     },
     filteredSoftware() {
-      if (!this.search) return this.software
-      return this.software.filter(item =>
-        item.name.toLowerCase().includes(this.search.toLowerCase()) ||
-        item.manufacturer.toLowerCase().includes(this.search.toLowerCase()) ||
-        item.site.toLowerCase().includes(this.search.toLowerCase())
+      if (!this.search) return this.softwareList
+      return this.softwareList.filter(item =>
+        (item.software_name && item.software_name.toLowerCase().includes(this.search.toLowerCase())) ||
+        (item.manufacturer && item.manufacturer.manufacturer_name && item.manufacturer.manufacturer_name.toLowerCase().includes(this.search.toLowerCase())) ||
+        (item.production_site && item.production_site.site_name && item.production_site.site_name.toLowerCase().includes(this.search.toLowerCase()))
       )
     },
     pagedSoftware() {
@@ -139,82 +169,131 @@ export default {
     }
   },
   methods: {
-    async fetchSoftware() {
+    async fetchSoftwareList() { // Renamed method
       this.loading = true
+      const softwareStore = useSoftwareStore()
       try {
-        // TODO: Replace with API call
-        this.software = [
-          { name: 'WinCC', manufacturer: 'Siemens', function: 'SCADA', license: 'ABC123', supplier: 'CSI', workstation: 'WS-001', site: 'Paris Factory' },
-          { name: 'FactoryTalk View', manufacturer: 'Rockwell', function: 'HMI', license: 'XYZ789', supplier: 'CLIENT', workstation: 'WS-002', site: 'Berlin Factory' },
-          { name: 'TIA Portal', manufacturer: 'Siemens', function: 'PLC Programming', license: 'LMN456', supplier: 'CSI', workstation: 'WS-001', site: 'Paris Factory' }
-        ]
+        if (softwareStore.software.length === 0) {
+          await softwareStore.fetchSoftware()
+        }
+        this.softwareList = softwareStore.software
+      } catch (error) {
+        ElMessage.error('Failed to fetch software: ' + error.message)
       } finally {
         this.loading = false
       }
     },
-    async fetchWorkstations() {
+    async fetchManufacturers() {
+      const manufacturersStore = useManufacturersStore()
       try {
-        // TODO: Replace with API call
-        this.workstations = [
-          { workstationId: 'WS-001', description: 'Main Server', site: 'Paris Factory' },
-          { workstationId: 'WS-002', description: 'Operator Workstation', site: 'Berlin Factory' }
-        ]
+        if (manufacturersStore.manufacturers.length === 0) {
+          await manufacturersStore.fetchManufacturers()
+        }
+        this.manufacturers = manufacturersStore.manufacturers
       } catch (error) {
-        console.error('Failed to fetch workstations:', error)
+        ElMessage.error('Failed to fetch manufacturers: ' + error.message)
+      }
+    },
+    async fetchProductionSites() {
+      const sitesStore = useProductionSitesStore()
+      try {
+        if (sitesStore.sites.length === 0) {
+         await sitesStore.fetchSites()
+        }
+        this.productionSites = sitesStore.sites
+      } catch (error) {
+        ElMessage.error('Failed to fetch production sites: ' + error.message)
+      }
+    },
+    async fetchComputerWorkstations() {
+      const workstationsStore = useComputerWorkstationsStore()
+      try {
+        if (workstationsStore.workstations.length === 0) {
+          await workstationsStore.fetchWorkstations()
+        }
+        this.computerWorkstations = workstationsStore.workstations
+      } catch (error) {
+        ElMessage.error('Failed to fetch computer workstations: ' + error.message)
       }
     },
     showAddDialog() {
       this.isEdit = false
+      this.currentSoftwareId = null
       this.softwareForm = {
-        name: '',
-        manufacturer: '',
+        software_name: '',
+        manufacturer_id: '',
         function: '',
-        license: '',
+        license_version: '',
+        license_type: '',
         supplier: '',
-        workstation: '',
-        site: ''
+        computer_workstation_id: null,
+        production_site_id: ''
       }
       this.dialogVisible = true
     },
     showEditDialog(item) {
       this.isEdit = true
-      this.softwareForm = { ...item }
+      this.currentSoftwareId = item.id
+      this.softwareForm = {
+        software_name: item.software_name,
+        manufacturer_id: item.manufacturer_id,
+        function: item.function,
+        license_version: item.license_version,
+        license_type: item.license_type,
+        supplier: item.supplier,
+        computer_workstation_id: item.computer_workstation_id,
+        production_site_id: item.production_site_id
+      }
       this.dialogVisible = true
     },
+    exportSoftware() {
+      ElMessage.success('Exported software!') // Placeholder
+    },
     async handleSubmit() {
+      if (!this.$refs.softwareForm) return
       try {
         await this.$refs.softwareForm.validate()
-        // TODO: Implement API call
+        const softwareStore = useSoftwareStore()
         if (this.isEdit) {
-          // Update software
+          await softwareStore.updateSoftware(this.currentSoftwareId, this.softwareForm)
+          ElMessage.success('Software updated successfully')
         } else {
-          // Create new software
+          await softwareStore.createSoftware(this.softwareForm)
+          ElMessage.success('Software created successfully')
         }
         this.dialogVisible = false
-        this.fetchSoftware()
+        this.fetchSoftwareList() // Refresh list
       } catch (error) {
-        console.error('Form validation failed:', error)
+        ElMessage.error('Failed to save software: ' + error.message)
       }
     },
-    confirmDelete(item) {
-      this.$confirm(
-        'This will permanently delete the software. Continue?',
-        'Warning',
-        {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
+    async confirmDelete(item) {
+      try {
+        await ElMessageBox.confirm(
+          'Are you sure you want to delete this software?',
+          'Warning',
+          {
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            type: 'warning'
+          }
+        )
+        const softwareStore = useSoftwareStore()
+        await softwareStore.deleteSoftware(item.id)
+        ElMessage.success('Software deleted successfully')
+        this.fetchSoftwareList() // Refresh list
+      } catch (error) {
+        if (error !== 'cancel') {
+          ElMessage.error('Failed to delete software: ' + error.message)
         }
-      ).then(() => {
-        // TODO: Implement delete
-        this.$message.success('Software deleted')
-        this.fetchSoftware()
-      })
+      }
     }
   },
   mounted() {
-    this.fetchSoftware()
-    this.fetchWorkstations()
+    this.fetchSoftwareList()
+    this.fetchManufacturers()
+    this.fetchProductionSites()
+    this.fetchComputerWorkstations()
   }
 }
 </script>
@@ -228,7 +307,16 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  flex-wrap: wrap;
   gap: 10px;
+}
+.left-actions, .right-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.search-input {
+  width: 200px;
 }
 .software-card {
   margin-top: 0;
