@@ -77,7 +77,7 @@
         ref="clientForm"
         :model="clientForm"
         :rules="rules"
-        label-width="140px"
+        label-width="165px"
       >
         <el-form-item label="Client Name" prop="client_name">
           <el-input v-model="clientForm.client_name" />

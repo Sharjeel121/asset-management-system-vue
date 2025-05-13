@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
-import { useApiStore } from './api'
+import appRequest from '@/helpers/request'
+import { useClientsStore } from '@/stores/clients'
+import { useProductionSitesStore } from '@/stores/productionSites'
 
 export const useProjectsStore = defineStore('projects', {
   state: () => ({
@@ -9,37 +11,17 @@ export const useProjectsStore = defineStore('projects', {
   }),
 
   getters: {
-    getProjectById: (state) => (id) => state.projects.find(project => project.id === id),
-    getProjectsByClientId: (state) => (clientId) => 
-      state.projects.filter(project => project.clientId === clientId)
+    getProjectById: (state) => (id) => state.projects.find(project => project.id === id)
   },
 
   actions: {
     async fetchProjects() {
-      const apiStore = useApiStore()
       this.loading = true
       this.error = null
 
       try {
-        // TODO: Replace with actual API call
-        this.projects = [
-          {
-            number: "PRJ-1001",
-            description: "Solar panel installation",
-            purchaseOrderDate: "2024-01-15",
-            commissioningDate: "2024-05-20",
-            client: "GreenTech Ltd.",
-            site: "Solar Farm Alpha, California"
-          },
-          {
-            number: "PRJ-1002",
-            description: "HVAC system upgrade",
-            purchaseOrderDate: "2024-02-28",
-            commissioningDate: "2024-06-10",
-            client: "CoolAir Inc.",
-            site: "Factory B, New Jersey"
-          }
-        ]
+        let response = await appRequest.get('/projects')
+        this.projects = response.data
       } catch (error) {
         this.error = error.message
         throw error
@@ -49,18 +31,25 @@ export const useProjectsStore = defineStore('projects', {
     },
 
     async createProject(projectData) {
-      const apiStore = useApiStore()
       this.loading = true
       this.error = null
 
       try {
-        // TODO: Replace with actual API call
-        const newProject = {
+        let response = await appRequest.post('/projects', projectData)
+        
+        const clientsStore = useClientsStore()
+        const sitesStore = useProductionSitesStore()
+        
+        const project = {
           id: this.projects.length + 1,
-          ...projectData
+          ...projectData,
+          client: clientsStore.clients.find(client => client.id === projectData.client_id),
+          production_site: sitesStore.sites.find(site => site.id === projectData.production_site_id)
         }
-        this.projects.push(newProject)
-        return newProject
+        console.log("🚀 ~ createProject ~ project:", project)
+        
+        this.projects.push(project)
+        return response.data
       } catch (error) {
         this.error = error.message
         throw error
@@ -70,16 +59,26 @@ export const useProjectsStore = defineStore('projects', {
     },
 
     async updateProject(id, projectData) {
-      const apiStore = useApiStore()
       this.loading = true
       this.error = null
 
       try {
-        // TODO: Replace with actual API call
+        let response = await appRequest.put(`/projects/${id}`, projectData)
+
+        const clientsStore = useClientsStore()
+        const sitesStore = useProductionSitesStore()
+        const updateProjectData = {
+          id: this.projects.length + 1,
+          ...projectData,
+          client: clientsStore.clients.find(client => client.id === projectData.client_id),
+          production_site: sitesStore.sites.find(site => site.id === projectData.production_site_id)
+        }
         const index = this.projects.findIndex(project => project.id === id)
         if (index !== -1) {
-          this.projects[index] = { ...this.projects[index], ...projectData }
-          return this.projects[index]
+          this.projects[index] = updateProjectData
+          console.log(this.projects[index]);
+          
+          return response
         }
         throw new Error('Project not found')
       } catch (error) {
@@ -91,12 +90,11 @@ export const useProjectsStore = defineStore('projects', {
     },
 
     async deleteProject(id) {
-      const apiStore = useApiStore()
       this.loading = true
       this.error = null
 
       try {
-        // TODO: Replace with actual API call
+        await appRequest.delete(`/projects/${id}`)
         const index = this.projects.findIndex(project => project.id === id)
         if (index !== -1) {
           this.projects.splice(index, 1)
