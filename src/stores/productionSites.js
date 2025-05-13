@@ -37,6 +37,7 @@ export const useProductionSitesStore = defineStore('productionSites', {
         let response = await appRequest.post('/production-sites', siteData)
         this.clients = useClientsStore().clients
         const site = {
+          id: this.sites.length + 1,
           ...siteData,
           client: this.clients.find(client => client.id === siteData.client_id)
         }        

@@ -239,7 +239,7 @@ export default {
         const sitesStore = useProductionSitesStore()
         await sitesStore.deleteSite(site.id)
         ElMessage.success('Production site deleted successfully')
-        this.fetchSites()
+        // this.fetchSites()
       } catch (error) {
         if (error !== 'cancel') {
           console.error('Failed to delete production site: ' + error.message)
