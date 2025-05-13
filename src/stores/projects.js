@@ -36,19 +36,21 @@ export const useProjectsStore = defineStore('projects', {
 
       try {
         let response = await appRequest.post('/projects', projectData)
+
+        await this.fetchProjects()
+
+        // const clientsStore = useClientsStore()
+        // const sitesStore = useProductionSitesStore()
         
-        const clientsStore = useClientsStore()
-        const sitesStore = useProductionSitesStore()
+        // const project = {
+        //   id: this.projects.length + 1,
+        //   ...projectData,
+        //   client: clientsStore.clients.find(client => client.id === projectData.client_id),
+        //   production_site: sitesStore.sites.find(site => site.id === projectData.production_site_id)
+        // }
+        // console.log("🚀 ~ createProject ~ project:", project)
         
-        const project = {
-          id: this.projects.length + 1,
-          ...projectData,
-          client: clientsStore.clients.find(client => client.id === projectData.client_id),
-          production_site: sitesStore.sites.find(site => site.id === projectData.production_site_id)
-        }
-        console.log("🚀 ~ createProject ~ project:", project)
-        
-        this.projects.push(project)
+        // this.projects.push(project)
         return response.data
       } catch (error) {
         this.error = error.message

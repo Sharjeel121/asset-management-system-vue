@@ -38,16 +38,17 @@ export const useUsersStore = defineStore('users', {
 
       try {
         // TODO: Replace with actual API call
-        let newUser = {
-          id: this.users.length + 1,
-          ...userData,
-          created_at: new Date().toISOString()
-        }
-
-        console.log("🚀 ~ createUser ~ newUser:", newUser)
         let response = await appRequest.post('users',userData)
-        this.users.push(newUser)
-        return newUser
+        await this.fetchUsers()
+        // let newUser = {
+        //   id: this.users.length + 1,
+        //   ...userData,
+        //   created_at: new Date().toISOString()
+        // }
+
+        // console.log("🚀 ~ createUser ~ newUser:", newUser)
+        // this.users.push(newUser)
+        return response
       } catch (error) {
         this.error = error.message
         throw error

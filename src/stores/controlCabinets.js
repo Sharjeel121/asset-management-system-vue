@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import { useApiStore } from './api'
+import appRequest from '@/helpers/request'
+import { useProductionSitesStore } from '@/stores/productionSites'
 
 export const useControlCabinetsStore = defineStore('controlCabinets', {
   state: () => ({
@@ -18,46 +19,12 @@ export const useControlCabinetsStore = defineStore('controlCabinets', {
 
   actions: {
     async fetchCabinets() {
-      const apiStore = useApiStore()
       this.loading = true
       this.error = null
 
       try {
-        // TODO: Replace with actual API call
-        this.cabinets = [
-          {
-            id: 1,
-            clientId: 1,
-            projectId: 1,
-            name: 'Main Control Cabinet',
-            type: 'PLC',
-            manufacturer: 'Siemens',
-            model: 'S7-1500',
-            serialNumber: 'SN123456',
-            location: 'Production Line A',
-            status: 'Operational',
-            installationDate: '2023-05-15',
-            lastMaintenanceDate: '2024-01-20',
-            nextMaintenanceDate: '2024-07-20',
-            notes: 'Regular maintenance required every 6 months'
-          },
-          {
-            id: 2,
-            clientId: 2,
-            projectId: 2,
-            name: 'SCADA Cabinet',
-            type: 'HMI',
-            manufacturer: 'Rockwell',
-            model: 'PanelView Plus 7',
-            serialNumber: 'SN789012',
-            location: 'Control Room',
-            status: 'Operational',
-            installationDate: '2023-08-10',
-            lastMaintenanceDate: '2024-02-15',
-            nextMaintenanceDate: '2024-08-15',
-            notes: 'Software updates pending'
-          }
-        ]
+        let response = await appRequest.get('/control-cabinets')
+        this.cabinets = response.data
       } catch (error) {
         this.error = error.message
         throw error
@@ -67,18 +34,22 @@ export const useControlCabinetsStore = defineStore('controlCabinets', {
     },
 
     async createCabinet(cabinetData) {
-      const apiStore = useApiStore()
       this.loading = true
       this.error = null
 
       try {
-        // TODO: Replace with actual API call
-        const newCabinet = {
-          id: this.cabinets.length + 1,
-          ...cabinetData
-        }
-        this.cabinets.push(newCabinet)
-        return newCabinet
+        let response = await appRequest.post('/control-cabinets', cabinetData)
+        
+        const sitesStore = useProductionSitesStore()
+        await this.fetchCabinets()
+        // const cabinet = {
+        //   id: this.cabinets.length + 1,
+        //   ...cabinetData,
+        //   production_site: sitesStore.sites.find(site => site.id === cabinetData.production_site_id)
+        // }
+        
+        // this.cabinets.push(cabinet)
+        return response.data
       } catch (error) {
         this.error = error.message
         throw error
@@ -88,16 +59,23 @@ export const useControlCabinetsStore = defineStore('controlCabinets', {
     },
 
     async updateCabinet(id, cabinetData) {
-      const apiStore = useApiStore()
       this.loading = true
       this.error = null
 
       try {
-        // TODO: Replace with actual API call
+        let response = await appRequest.put(`/control-cabinets/${id}`, cabinetData)
+
+        const sitesStore = useProductionSitesStore()
+        const updateCabinetData = {
+          id: id,
+          ...cabinetData,
+          production_site: sitesStore.sites.find(site => site.id === cabinetData.production_site_id)
+        }
+        
         const index = this.cabinets.findIndex(cabinet => cabinet.id === id)
         if (index !== -1) {
-          this.cabinets[index] = { ...this.cabinets[index], ...cabinetData }
-          return this.cabinets[index]
+          this.cabinets[index] = updateCabinetData
+          return response
         }
         throw new Error('Cabinet not found')
       } catch (error) {
@@ -109,12 +87,12 @@ export const useControlCabinetsStore = defineStore('controlCabinets', {
     },
 
     async deleteCabinet(id) {
-      const apiStore = useApiStore()
       this.loading = true
       this.error = null
 
       try {
-        // TODO: Replace with actual API call
+        await appRequest.delete(`/control-cabinets/${id}`)
+       
         const index = this.cabinets.findIndex(cabinet => cabinet.id === id)
         if (index !== -1) {
           this.cabinets.splice(index, 1)

@@ -35,13 +35,14 @@ export const useProductionSitesStore = defineStore('productionSites', {
 
       try {
         let response = await appRequest.post('/production-sites', siteData)
-        this.clients = useClientsStore().clients
-        const site = {
-          id: this.sites.length + 1,
-          ...siteData,
-          client: this.clients.find(client => client.id === siteData.client_id)
-        }        
-        this.sites.push(site)
+        await this.fetchSites()
+        // this.clients = useClientsStore().clients
+        // const site = {
+        //   id: this.sites.length + 1,
+        //   ...siteData,
+        //   client: this.clients.find(client => client.id === siteData.client_id)
+        // }        
+        // this.sites.push(site)
         return response.data
       } catch (error) {
         this.error = error.message

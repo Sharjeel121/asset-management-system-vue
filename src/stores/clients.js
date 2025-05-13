@@ -34,13 +34,14 @@ export const useClientsStore = defineStore('clients', {
 
       try {
         // TODO: Replace with actual API call
-        const newClient = {
-          id: this.clients.length + 1,
-          ...clientData
-        }
         let response = await appRequest.post('/clients', clientData)
-        this.clients.push(newClient)
-        return newClient
+        await this.fetchClients()
+        // const newClient = {
+        //   id: this.clients.length + 1,
+        //   ...clientData
+        // }
+        // this.clients.push(newClient)
+        return response
       } catch (error) {
         this.error = error.message
         throw error
