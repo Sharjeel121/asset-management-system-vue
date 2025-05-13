@@ -26,7 +26,7 @@
         <el-table-column prop="manufacturer_name" label="Manufacturer Name" min-width="120" />
         <el-table-column prop="headquarters_address" label="Headquarters Address" min-width="180" />
         <el-table-column prop="product_range" label="Product Range" min-width="130" />
-        <el-table-column prop="manufacturer_website" label="Manufacturer Website" min-width="180" />
+        <el-table-column prop="website" label="Manufacturer Website" min-width="180" />
         <el-table-column label="Actions" width="140">
           <template #default="scope">
             <el-button-group>
@@ -68,8 +68,8 @@
         <el-form-item label="Product Range" prop="product_range">
           <el-input v-model="manufacturerForm.product_range" />
         </el-form-item>
-        <el-form-item label="Manufacturer Website" prop="manufacturer_website">
-          <el-input v-model="manufacturerForm.manufacturer_website" />
+        <el-form-item label="Manufacturer Website" prop="website">
+          <el-input v-model="manufacturerForm.website" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -100,14 +100,14 @@ export default {
       manufacturerForm: {
         manufacturer_name: '',
         headquarters_address: '',
-        manufacturer_website: '',
+        website: '',
         product_range: ''
       },
       rules: {
         manufacturer_name: [{ required: true, message: 'Please enter manufacturer name', trigger: 'blur' }],
         headquarters_address: [{ required: true, message: 'Please enter headquarters address', trigger: 'blur' }],
         product_range: [{ required: true, message: 'Please enter product range', trigger: 'blur' }],
-        manufacturer_website: [{ required: true, message: 'Please enter manufacturer website', trigger: 'blur' }]
+        website: [{ required: true, message: 'Please enter manufacturer website', trigger: 'blur' }]
       },
       search: '',
       currentPage: 1,
@@ -152,7 +152,7 @@ export default {
       this.manufacturerForm = {
         manufacturer_name: '',
         headquarters_address: '',
-        manufacturer_website: '',
+        website: '',
         product_range: ''
       }
       this.dialogVisible = true
@@ -163,7 +163,7 @@ export default {
       this.manufacturerForm = {
         manufacturer_name: manufacturer.manufacturer_name,
         headquarters_address: manufacturer.headquarters_address,
-        manufacturer_website: manufacturer.manufacturer_website,
+        website: manufacturer.website,
         product_range: manufacturer.product_range
       }
       this.dialogVisible = true

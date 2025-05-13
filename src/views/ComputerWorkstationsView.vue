@@ -23,7 +23,7 @@
         <el-table-column prop="type" label="Type" min-width="100" />
         <el-table-column prop="processor_specifications" label="Processor" min-width="150" />
         <el-table-column prop="ram" label="RAM" min-width="100" />
-        <el-table-column prop="hard_disk_capacity" label="Hard Disk" min-width="100" />
+        <el-table-column prop="harddisk_capacity" label="Hard Disk" min-width="100" />
         <el-table-column prop="operating_system" label="Operating System" min-width="150" />
         <el-table-column prop="manufacturer.manufacturer_name" label="Manufacturer" min-width="150" />
         <el-table-column prop="model" label="Model" min-width="120" />
@@ -73,8 +73,8 @@
             <el-option v-for="ram in ramOptions" :key="ram" :label="ram" :value="ram" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Hard Disk" prop="hard_disk_capacity">
-          <el-select v-model="workstationForm.hard_disk_capacity" placeholder="Select hard disk">
+        <el-form-item label="Hard Disk" prop="harddisk_capacity">
+          <el-select v-model="workstationForm.harddisk_capacity" placeholder="Select hard disk">
             <el-option v-for="disk in hardDiskOptions" :key="disk" :label="disk" :value="disk" />
           </el-select>
         </el-form-item>
@@ -156,7 +156,7 @@ export default {
         type: '',
         processor_specifications: '',
         ram: '',
-        hard_disk_capacity: '',
+        harddisk_capacity: '',
         operating_system: '',
         manufacturer_id: '',
         model: '',
@@ -171,7 +171,7 @@ export default {
         type: [{ required: true, message: 'Please select type', trigger: 'change' }],
         processor_specifications: [{ required: true, message: 'Please enter processor', trigger: 'blur' }],
         ram: [{ required: true, message: 'Please select RAM', trigger: 'change' }],
-        hard_disk_capacity: [{ required: true, message: 'Please select hard disk', trigger: 'change' }],
+        harddisk_capacity: [{ required: true, message: 'Please select hard disk', trigger: 'change' }],
         operating_system: [{ required: true, message: 'Please enter operating system', trigger: 'blur' }],
         manufacturer_id: [{ required: true, message: 'Please select manufacturer', trigger: 'change' }],
         model: [{ required: true, message: 'Please enter model', trigger: 'blur' }],
@@ -250,7 +250,7 @@ export default {
         type: '',
         processor_specifications: '',
         ram: '',
-        hard_disk_capacity: '',
+        harddisk_capacity: '',
         operating_system: '',
         manufacturer_id: '',
         model: '',
@@ -270,7 +270,7 @@ export default {
         type: workstation.type,
         processor_specifications: workstation.processor_specifications,
         ram: workstation.ram,
-        hard_disk_capacity: workstation.hard_disk_capacity,
+        harddisk_capacity: workstation.harddisk_capacity,
         operating_system: workstation.operating_system,
         manufacturer_id: workstation.manufacturer_id,
         model: workstation.model,
