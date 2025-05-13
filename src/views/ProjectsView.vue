@@ -184,7 +184,9 @@ export default {
     async fetchClients() {
       const clientsStore = useClientsStore()
       try {
-        await clientsStore.fetchClients()
+        if(clientsStore.clients.length === 0) {
+          await clientsStore.fetchClients()
+        }
         this.clients = clientsStore.clients.map(c => c.name)
       } catch (error) {
         console.error('Failed to fetch clients:', error)

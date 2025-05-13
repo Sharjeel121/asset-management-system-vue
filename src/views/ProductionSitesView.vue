@@ -1,26 +1,40 @@
 <template>
   <div class="sites-container">
     <div class="header-actions">
-      <el-button type="primary" @click="showAddDialog">
-        <el-icon><plus /></el-icon>
-        New Site
-      </el-button>
-      <el-input v-model="search" placeholder="Search..." size="small" class="search-input" clearable />
+      <div class="left-actions">
+        <el-button type="primary" @click="showAddDialog">
+          <el-icon><plus /></el-icon>
+          New Production Site
+        </el-button>
+        <el-button @click="exportSites">
+          <el-icon><download /></el-icon>
+          Export
+        </el-button>
+      </div>
+      <div class="right-actions">
+        <el-input v-model="search" placeholder="Search..." size="medium" class="search-input" clearable />
+      </div>
     </div>
+
     <el-card class="sites-card">
-      <el-table :data="pagedSites" style="width: 100%" v-loading="loading">
-        <el-table-column prop="name" label="Site Name" />
-        <el-table-column prop="address" label="Address" />
+      <el-table
+        :data="pagedSites"
+        style="width: 100%"
+        v-loading="loading"
+      >
+        <el-table-column type="index" label="#" width="50" />
+        <el-table-column prop="client.client_name" label="Client" />
+        <el-table-column prop="site_name" label="Site Name" min-width="130" />
+        <el-table-column prop="site_address" label="Site Address" min-width="150" />
         <el-table-column prop="city" label="City" />
         <el-table-column prop="country" label="Country" />
-        <el-table-column prop="contactName" label="Contact Name" />
-        <el-table-column prop="contactEmail" label="Contact Email" />
-        <el-table-column prop="contactPhone" label="Contact Phone" />
-        <el-table-column prop="client" label="Client" />
-        <el-table-column label="Actions" width="180">
+        <el-table-column prop="contact_person_name" label="Contact Name" min-width="130" />
+        <el-table-column prop="contact_person_email" label="Contact Email" min-width="130" />
+        <el-table-column prop="contact_person_phone_number" label="Contact Phone" min-width="130" />
+        <el-table-column label="Actions" width="140">
           <template #default="scope">
             <el-button-group>
-              <el-button size="small" @click="showEditDialog(scope.row)">Edit</el-button>
+              <el-button type="primary" size="small" @click="showEditDialog(scope.row)">Edit</el-button>
               <el-button type="danger" size="small" @click="confirmDelete(scope.row)">Delete</el-button>
             </el-button-group>
           </template>
@@ -32,44 +46,56 @@
           layout="prev, pager, next"
           :total="filteredSites.length"
           :page-size="pageSize"
-          :current-page.sync="currentPage"
+          v-model:current-page="currentPage"
         />
       </div>
     </el-card>
+
     <!-- Add/Edit Dialog -->
-    <el-dialog :title="dialogTitle" v-model="dialogVisible" width="600px">
-      <el-form ref="siteForm" :model="siteForm" :rules="rules" label-width="140px">
-        <el-form-item label="Site Name" prop="name">
-          <el-input v-model="siteForm.name" />
+    <el-dialog
+      :title="dialogTitle"
+      v-model="dialogVisible"
+      width="600px"
+    >
+      <el-form
+        ref="siteForm"
+        :model="siteForm"
+        :rules="rules"
+        label-width="140px"
+      >
+        <el-form-item label="Client" prop="client_id">
+          <el-select v-model="siteForm.client_id" placeholder="Select Client">
+            <el-option v-for="client in clients" :key="client.id" :label="client.client_name" :value="client.id" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="Address" prop="address">
-          <el-input v-model="siteForm.address" />
+        <el-form-item label="Site Name" prop="site_name">
+          <el-input v-model="siteForm.site_name" />
         </el-form-item>
-        <el-form-item label="City" prop="city">
-          <el-input v-model="siteForm.city" />
+        <el-form-item label="Site Address" prop="site_address">
+          <el-input v-model="siteForm.site_address" />
         </el-form-item>
         <el-form-item label="Country" prop="country">
-          <el-input v-model="siteForm.country" />
+          <country-select class="custom-select" v-model="siteForm.country" :country="siteForm.country" topCountry="US" />        
         </el-form-item>
-        <el-form-item label="Contact Name" prop="contactName">
-          <el-input v-model="siteForm.contactName" />
+        <el-form-item label="City" prop="city">
+          <region-select class="custom-select" v-model="siteForm.city" :country="siteForm.country" :region="siteForm.city" />
         </el-form-item>
-        <el-form-item label="Contact Email" prop="contactEmail">
-          <el-input v-model="siteForm.contactEmail" />
+        <el-form-item label="Contact Name" prop="contact_person_name">
+          <el-input v-model="siteForm.contact_person_name" />
         </el-form-item>
-        <el-form-item label="Contact Phone" prop="contactPhone">
-          <el-input v-model="siteForm.contactPhone" />
+        <el-form-item label="Contact Email" prop="contact_person_email">
+          <el-input v-model="siteForm.contact_person_email" />
         </el-form-item>
-        <el-form-item label="Client" prop="client">
-          <el-select v-model="siteForm.client" filterable placeholder="Select client">
-            <el-option v-for="client in clients" :key="client" :label="client" :value="client" />
-          </el-select>
+        <el-form-item label="Contact Phone" prop="contact_person_phone_number">
+          <el-input v-model="siteForm.contact_person_phone_number" />
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">Cancel</el-button>
-          <el-button type="primary" @click="handleSubmit">{{ isEdit ? 'Update' : 'Create' }}</el-button>
+          <el-button type="primary" @click="handleSubmit">
+            {{ isEdit ? 'Update' : 'Create' }}
+          </el-button>
         </span>
       </template>
     </el-dialog>
@@ -77,37 +103,46 @@
 </template>
 
 <script>
+import { useProductionSitesStore } from '@/stores/productionSites'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { useClientsStore } from '@/stores/clients'
+
 export default {
   name: 'ProductionSitesView',
   data() {
     return {
       loading: false,
+      clients: [],
       sites: [],
-      clients: ['Acme Industries', 'TechCorp Global', 'Electro Systems'],
       dialogVisible: false,
       isEdit: false,
+      currentSiteId: null,
       siteForm: {
-        name: '',
-        address: '',
+        client_id:'',
+        site_name: '',
+        site_address: '',
         city: '',
         country: '',
-        contactName: '',
-        contactEmail: '',
-        contactPhone: '',
-        client: ''
+        contact_person_name: '',
+        contact_person_email: '',
+        contact_person_phone_number: ''
       },
       rules: {
-        name: [{ required: true, message: 'Please enter site name', trigger: 'blur' }],
-        address: [{ required: true, message: 'Please enter address', trigger: 'blur' }],
-        city: [{ required: true, message: 'Please enter city', trigger: 'blur' }],
-        country: [{ required: true, message: 'Please enter country', trigger: 'blur' }],
-        contactName: [{ required: true, message: 'Please enter contact name', trigger: 'blur' }],
-        contactEmail: [
-          { required: true, message: 'Please enter contact email', trigger: 'blur' },
-          { type: 'email', message: 'Please enter valid email', trigger: 'blur' }
+        client_id: [
+          { required: true, message: 'Please select client', trigger: 'blur' }
         ],
-        contactPhone: [{ required: true, message: 'Please enter contact phone', trigger: 'blur' }],
-        client: [{ required: true, message: 'Please select client', trigger: 'change' }]
+        site_name: [
+          { required: true, message: 'Please enter site name', trigger: 'blur' }
+        ],
+        site_address: [
+          { required: true, message: 'Please enter site address', trigger: 'blur' }
+        ],
+        city: [
+          { required: true, message: 'Please enter city', trigger: 'blur' }
+        ],
+        country: [
+          { required: true, message: 'Please enter country', trigger: 'blur' }
+        ]
       },
       search: '',
       currentPage: 1,
@@ -116,13 +151,14 @@ export default {
   },
   computed: {
     dialogTitle() {
-      return this.isEdit ? 'Edit Site' : 'Add New Site'
+      return this.isEdit ? 'Edit Production Site' : 'Add New Production Site'
     },
     filteredSites() {
       if (!this.search) return this.sites
-      return this.sites.filter(item =>
-        item.name.toLowerCase().includes(this.search.toLowerCase()) ||
-        item.client.toLowerCase().includes(this.search.toLowerCase())
+      return this.sites.filter(site =>
+        site.site_name.toLowerCase().includes(this.search.toLowerCase()) ||
+        site.country.toLowerCase().includes(this.search.toLowerCase()) ||
+        (site.contact_person_name && site.contact_person_name.toLowerCase().includes(this.search.toLowerCase()))
       )
     },
     pagedSites() {
@@ -134,72 +170,104 @@ export default {
     async fetchSites() {
       this.loading = true
       try {
-        // TODO: Replace with API call
-        this.sites = [
-          { name: 'Paris Factory', address: '123 Rue de Paris', city: 'Paris', country: 'France', contactName: 'Jean Dupont', contactEmail: 'jean@acme.com', contactPhone: '+33 123 4567', client: 'Acme Industries' },
-          { name: 'Berlin Factory', address: '456 Berliner Str.', city: 'Berlin', country: 'Germany', contactName: 'Hans Müller', contactEmail: 'hans@techcorp.com', contactPhone: '+49 987 6543', client: 'TechCorp Global' }
-        ]
+        const sitesStore = useProductionSitesStore()
+        if(sitesStore.sites.length === 0) {
+          await sitesStore.fetchSites()
+        }
+        this.sites = sitesStore.sites
+      } catch (error) {
+        console.error('Failed to fetch sites: ' + error.message)
       } finally {
         this.loading = false
       }
     },
     showAddDialog() {
       this.isEdit = false
+      this.currentSiteId = null
       this.siteForm = {
-        name: '',
-        address: '',
+        client_id:'',
+        site_name: '',
+        site_address: '',
         city: '',
         country: '',
-        contactName: '',
-        contactEmail: '',
-        contactPhone: '',
-        client: ''
+        contact_person_name: '',
+        contact_person_email: '',
+        contact_person_phone_number: ''
       }
       this.dialogVisible = true
     },
-    showEditDialog(item) {
+    showEditDialog(site) {
       this.isEdit = true
-      this.siteForm = { ...item }
+      this.currentSiteId = site.id
+      this.siteForm = { ...site }
       this.dialogVisible = true
+    },
+    exportSites() {
+      ElMessage.success('Exported production sites!')
     },
     async handleSubmit() {
+      if (!this.$refs.siteForm) return
+      
       try {
         await this.$refs.siteForm.validate()
-        // TODO: Implement API call
+        const sitesStore = useProductionSitesStore()
+        
         if (this.isEdit) {
-          // Update site
+          await sitesStore.updateSite(this.currentSiteId, this.siteForm)
+          ElMessage.success('Production site updated successfully')
         } else {
-          // Create new site
+          await sitesStore.createSite(this.siteForm)
+          ElMessage.success('Production site created successfully')
         }
         this.dialogVisible = false
-        this.fetchSites()
+        // this.fetchSites()
       } catch (error) {
-        console.error('Form validation failed:', error)
+        console.error('Failed to save production site: ' + error.message)
       }
     },
-    confirmDelete(item) {
-      this.$confirm(
-        'This will permanently delete the site. Continue?',
-        'Warning',
-        {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
-        }
-      ).then(() => {
-        // TODO: Implement delete
-        this.$message.success('Site deleted')
+    async confirmDelete(site) {
+      try {
+        await ElMessageBox.confirm(
+          'Are you sure you want to delete this production site?',
+          'Warning',
+          {
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            type: 'warning'
+          }
+        )
+        const sitesStore = useProductionSitesStore()
+        await sitesStore.deleteSite(site.id)
+        ElMessage.success('Production site deleted successfully')
         this.fetchSites()
-      })
+      } catch (error) {
+        if (error !== 'cancel') {
+          console.error('Failed to delete production site: ' + error.message)
+        }
+      }
+    },
+    async fetchClients() {
+      const clientsStore = useClientsStore()
+      if(clientsStore.clients.length === 0) {
+        await clientsStore.fetchClients()
+      }
+      this.clients = clientsStore.clients
     }
   },
   mounted() {
+    this.fetchClients()
     this.fetchSites()
   }
 }
 </script>
 
 <style scoped>
+.custom-select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  border-color: #dcdfe6;
+}
 .sites-container {
   padding: 20px;
 }
@@ -208,6 +276,17 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.left-actions {
+  display: flex;
+  gap: 10px;
+}
+.right-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 .search-input {
   width: 200px;

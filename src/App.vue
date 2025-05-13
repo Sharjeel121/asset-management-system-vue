@@ -53,6 +53,10 @@
             <el-icon><user /></el-icon>
             <span>Clients</span>
           </el-menu-item>
+          <el-menu-item index="/production-sites">
+            <el-icon><office-building /></el-icon>
+            <span>Production Sites</span>
+          </el-menu-item>
           <el-menu-item index="/projects">
             <el-icon><document /></el-icon>
             <span>Projects</span>
