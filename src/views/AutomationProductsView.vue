@@ -1,26 +1,36 @@
 <template>
   <div class="products-container">
     <div class="header-actions">
-      <el-button type="primary" @click="showAddDialog">
-        <el-icon><plus /></el-icon>
-        New Product
-      </el-button>
-      <el-input v-model="search" placeholder="Search..." size="medium" class="search-input" clearable />
+      <div class="left-actions">
+        <el-button type="primary" @click="showAddDialog">
+          <el-icon><plus /></el-icon>
+          Add New Product
+        </el-button>
+        <el-button @click="exportProducts">
+          <el-icon><download /></el-icon>
+          Export
+        </el-button>
+      </div>
+      <div class="right-actions">
+        <el-input v-model="search" placeholder="Search..." size="medium" class="search-input" clearable />
+      </div>
     </div>
     <el-card class="products-card">
       <el-table :data="pagedProducts" style="width: 100%" v-loading="loading">
+        <el-table-column type="index" label="#" width="50" />
         <el-table-column prop="description" label="Description" min-width="130" />
-        <el-table-column prop="manufacturer" label="Manufacturer" min-width="120" />
-        <el-table-column prop="reference" label="Reference Number" min-width="130" />
+        <el-table-column prop="manufacturer.manufacturer_name" label="Manufacturer" min-width="120" />
+        <el-table-column prop="reference_number" label="Part Number" min-width="130" />
         <el-table-column prop="quantity" label="Quantity" min-width="100" />
         <el-table-column prop="function" label="Function" />
-        <el-table-column prop="lifecycle" label="Lifecycle Stage" />
+        <el-table-column prop="lifecycle_stage" label="Lifecycle Stage" />
         <el-table-column prop="supplier" label="Supplier" />
-        <el-table-column prop="cabinet" label="Control Cabinet" />
-        <el-table-column label="Actions" min-width="130">
+        <el-table-column prop="control_cabinet.cabinet_id" label="Control Cabinet" />
+        <el-table-column prop="production_site.site_name" label="Production Site" />
+        <el-table-column label="Actions" width="140">
           <template #default="scope">
             <el-button-group>
-              <el-button size="small" @click="showEditDialog(scope.row)">Edit</el-button>
+              <el-button type="primary" size="small" @click="showEditDialog(scope.row)">Edit</el-button>
               <el-button type="danger" size="small" @click="confirmDelete(scope.row)">Delete</el-button>
             </el-button-group>
           </template>
@@ -32,23 +42,23 @@
           layout="prev, pager, next"
           :total="filteredProducts.length"
           :page-size="pageSize"
-          :current-page.sync="currentPage"
+          v-model:current-page="currentPage"
         />
       </div>
     </el-card>
     <!-- Add/Edit Dialog -->
     <el-dialog :title="dialogTitle" v-model="dialogVisible" width="600px">
-      <el-form ref="productForm" :model="productForm" :rules="rules" label-width="140px">
+      <el-form ref="productForm" :model="productForm" :rules="rules" label-width="170px">
         <el-form-item label="Description" prop="description">
           <el-input v-model="productForm.description" />
         </el-form-item>
-        <el-form-item label="Manufacturer" prop="manufacturer">
-          <el-select v-model="productForm.manufacturer" filterable placeholder="Select manufacturer">
-            <el-option v-for="m in manufacturers" :key="m" :label="m" :value="m" />
+        <el-form-item label="Manufacturer" prop="manufacturer_id">
+          <el-select v-model="productForm.manufacturer_id" filterable placeholder="Select manufacturer">
+            <el-option v-for="m in manufacturers" :key="m.id" :label="m.manufacturer_name" :value="m.id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Reference Number" prop="reference">
-          <el-input v-model="productForm.reference" />
+        <el-form-item label="Part Number" prop="reference_number">
+          <el-input v-model="productForm.reference_number" />
         </el-form-item>
         <el-form-item label="Quantity" prop="quantity">
           <el-input-number v-model="productForm.quantity" :min="0" />
@@ -65,8 +75,8 @@
             <el-option label="Other" value="Other" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Lifecycle Stage" prop="lifecycle">
-          <el-select v-model="productForm.lifecycle" placeholder="Select lifecycle">
+        <el-form-item label="Lifecycle Stage" prop="lifecycle_stage">
+          <el-select v-model="productForm.lifecycle_stage" placeholder="Select lifecycle">
             <el-option label="Obsolete" value="Obsolete" />
             <el-option label="Active" value="Active" />
             <el-option label="Mature" value="Mature" />
@@ -78,16 +88,23 @@
             <el-option label="CLIENT" value="CLIENT" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Control Cabinet" prop="cabinet">
-          <el-select v-model="productForm.cabinet" filterable placeholder="Select cabinet">
-            <el-option v-for="c in cabinets" :key="c" :label="c" :value="c" />
+        <el-form-item label="Control Cabinet" prop="control_cabinet_id">
+          <el-select v-model="productForm.control_cabinet_id" filterable placeholder="Select cabinet">
+            <el-option v-for="c in controlCabinets" :key="c.id" :label="c.cabinet_id" :value="c.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Production Site" prop="production_site_id">
+          <el-select v-model="productForm.production_site_id" filterable placeholder="Select site">
+            <el-option v-for="site in productionSites" :key="site.id" :label="site.site_name" :value="site.id" />
           </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">Cancel</el-button>
-          <el-button type="primary" @click="handleSubmit">{{ isEdit ? 'Update' : 'Create' }}</el-button>
+          <el-button type="primary" @click="handleSubmit">
+            {{ isEdit ? 'Update' : 'Create' }}
+          </el-button>
         </span>
       </template>
     </el-dialog>
@@ -95,35 +112,45 @@
 </template>
 
 <script>
+import { useAutomationProductsStore } from '@/stores/automationProducts'
+import { useManufacturersStore } from '@/stores/manufacturers'
+import { useProductionSitesStore } from '@/stores/productionSites'
+import { useControlCabinetsStore } from '@/stores/controlCabinets'
+import { ElMessage, ElMessageBox } from 'element-plus'
+
 export default {
-  name: 'ProductsView',
+  name: 'AutomationProductsView',
   data() {
     return {
       loading: false,
       products: [],
-      manufacturers: ['Siemens', 'Schneider', 'Allen-Bradley'],
-      cabinets: ['CAB-001', 'CAB-002'],
+      manufacturers: [],
+      productionSites: [],
+      controlCabinets: [],
       dialogVisible: false,
       isEdit: false,
+      currentProductId: null,
       productForm: {
         description: '',
-        manufacturer: '',
-        reference: '',
+        manufacturer_id: '',
+        reference_number: '',
         quantity: 0,
         function: '',
-        lifecycle: '',
+        lifecycle_stage: '',
         supplier: '',
-        cabinet: ''
+        control_cabinet_id: '',
+        production_site_id: ''
       },
       rules: {
         description: [{ required: true, message: 'Please enter description', trigger: 'blur' }],
-        manufacturer: [{ required: true, message: 'Please select manufacturer', trigger: 'change' }],
-        reference: [{ required: true, message: 'Please enter reference number', trigger: 'blur' }],
+        manufacturer_id: [{ required: true, message: 'Please select manufacturer', trigger: 'change' }],
+        reference_number: [{ required: true, message: 'Please enter part number', trigger: 'blur' }],
         quantity: [{ required: true, message: 'Please enter quantity', trigger: 'blur', type: 'number', min: 0 }],
         function: [{ required: true, message: 'Please select function', trigger: 'change' }],
-        lifecycle: [{ required: true, message: 'Please select lifecycle stage', trigger: 'change' }],
+        lifecycle_stage: [{ required: true, message: 'Please select lifecycle stage', trigger: 'change' }],
         supplier: [{ required: true, message: 'Please select supplier', trigger: 'change' }],
-        cabinet: [{ required: true, message: 'Please select control cabinet', trigger: 'change' }]
+        control_cabinet_id: [{ required: true, message: 'Please select control cabinet', trigger: 'change' }],
+        production_site_id: [{ required: true, message: 'Please select production site', trigger: 'change' }]
       },
       search: '',
       currentPage: 1,
@@ -136,9 +163,9 @@ export default {
     },
     filteredProducts() {
       if (!this.search) return this.products
-      return this.products.filter(item =>
-        item.description.toLowerCase().includes(this.search.toLowerCase()) ||
-        item.manufacturer.toLowerCase().includes(this.search.toLowerCase())
+      return this.products.filter(product =>
+        product.description.toLowerCase().includes(this.search.toLowerCase()) ||
+        (product.manufacturer && product.manufacturer.manufacturer_name && product.manufacturer.manufacturer_name.toLowerCase().includes(this.search.toLowerCase()))
       )
     },
     pagedProducts() {
@@ -150,67 +177,130 @@ export default {
     async fetchProducts() {
       this.loading = true
       try {
-        // TODO: Replace with API call
-        this.products = [
-          { description: 'CPU 315-2 PN/DP', manufacturer: 'Siemens', reference: '6ES7315-2EH14', quantity: 24, function: 'CPU controller', lifecycle: 'Active', supplier: 'CSI', cabinet: 'CAB-001' },
-          { description: 'DI32xDC24V', manufacturer: 'Siemens', reference: '6ES7321-1BL00', quantity: 47, function: 'I/O module', lifecycle: 'Active', supplier: 'CLIENT', cabinet: 'CAB-002' }
-        ]
+        const productsStore = useAutomationProductsStore()
+        if(productsStore.products.length === 0) {
+          await productsStore.fetchProducts()
+        }
+        this.products = productsStore.products
+      } catch (error) {
+        ElMessage.error('Failed to fetch products: ' + error.message)
       } finally {
         this.loading = false
       }
     },
+    async fetchManufacturers() {
+      const manufacturersStore = useManufacturersStore()
+      try {
+        if(manufacturersStore.manufacturers.length === 0) {
+          await manufacturersStore.fetchManufacturers()
+        }
+        this.manufacturers = manufacturersStore.manufacturers
+      } catch (error) {
+        ElMessage.error('Failed to fetch manufacturers: ' + error.message)
+      }
+    },
+    async fetchProductionSites() {
+      const sitesStore = useProductionSitesStore()
+      try {
+        if(sitesStore.sites.length === 0) {
+          await sitesStore.fetchSites()
+        }
+        this.productionSites = sitesStore.sites
+      } catch (error) {
+        ElMessage.error('Failed to fetch production sites: ' + error.message)
+      }
+    },
+    async fetchControlCabinets() {
+      const cabinetsStore = useControlCabinetsStore()
+      try {
+        if(cabinetsStore.cabinets.length === 0) {
+          await cabinetsStore.fetchCabinets()
+        }
+        this.controlCabinets = cabinetsStore.cabinets
+      } catch (error) {
+        ElMessage.error('Failed to fetch control cabinets: ' + error.message)
+      }
+    },
     showAddDialog() {
       this.isEdit = false
+      this.currentProductId = null
       this.productForm = {
         description: '',
-        manufacturer: '',
-        reference: '',
+        manufacturer_id: '',
+        reference_number: '',
         quantity: 0,
         function: '',
-        lifecycle: '',
+        lifecycle_stage: '',
         supplier: '',
-        cabinet: ''
+        control_cabinet_id: '',
+        production_site_id: ''
       }
       this.dialogVisible = true
     },
-    showEditDialog(item) {
+    showEditDialog(product) {
       this.isEdit = true
-      this.productForm = { ...item }
+      this.currentProductId = product.id
+      this.productForm = {
+        description: product.description,
+        manufacturer_id: product.manufacturer_id,
+        reference_number: product.reference_number,
+        quantity: product.quantity,
+        function: product.function,
+        lifecycle_stage: product.lifecycle_stage,
+        supplier: product.supplier,
+        control_cabinet_id: product.control_cabinet_id,
+        production_site_id: product.production_site_id
+      }
       this.dialogVisible = true
     },
+    exportProducts() {
+      ElMessage.success('Exported products!')
+    },
     async handleSubmit() {
+      if (!this.$refs.productForm) return
       try {
         await this.$refs.productForm.validate()
-        // TODO: Implement API call
+        const productsStore = useAutomationProductsStore()
         if (this.isEdit) {
-          // Update product
+          await productsStore.updateProduct(this.currentProductId, this.productForm)
+          ElMessage.success('Product updated successfully')
         } else {
-          // Create new product
+          await productsStore.createProduct(this.productForm)
+          ElMessage.success('Product created successfully')
         }
         this.dialogVisible = false
         this.fetchProducts()
       } catch (error) {
-        console.error('Form validation failed:', error)
+        ElMessage.error('Failed to save product: ' + error.message)
       }
     },
-    confirmDelete(item) {
-      this.$confirm(
-        'This will permanently delete the product. Continue?',
-        'Warning',
-        {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
-        }
-      ).then(() => {
-        // TODO: Implement delete
-        this.$message.success('Product deleted')
+    async confirmDelete(product) {
+      try {
+        await ElMessageBox.confirm(
+          'Are you sure you want to delete this product?',
+          'Warning',
+          {
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            type: 'warning'
+          }
+        )
+        const productsStore = useAutomationProductsStore()
+        await productsStore.deleteProduct(product.id)
+        ElMessage.success('Product deleted successfully')
         this.fetchProducts()
-      })
+      } catch (error) {
+        if (error !== 'cancel') {
+          ElMessage.error('Failed to delete product: ' + error.message)
+        }
+      }
     }
   },
   mounted() {
     this.fetchProducts()
+    this.fetchManufacturers()
+    this.fetchProductionSites()
+    this.fetchControlCabinets()
   }
 }
 </script>
@@ -224,9 +314,21 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  flex-wrap: wrap;
   gap: 10px;
 }
-
+.left-actions {
+  display: flex;
+  gap: 10px;
+}
+.right-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.search-input {
+  width: 200px;
+}
 .products-card {
   margin-top: 0;
 }
