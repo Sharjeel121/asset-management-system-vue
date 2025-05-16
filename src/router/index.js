@@ -12,7 +12,7 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: () => import('../views/LoginView.vue')
+      component: () => import('../views/LoginView.vue'),
     },
     {
       path: '/home',
@@ -86,6 +86,11 @@ const router = createRouter({
 // Navigation guard
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
+  // Redirect to home if user is logged in and trying to access login page
+  if (to.path === '/login' && authStore.isAuthenticated) {
+    next('/home')
+    return
+  }
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next('/login')
   } else {

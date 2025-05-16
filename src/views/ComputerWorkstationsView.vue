@@ -79,7 +79,13 @@
           </el-select>
         </el-form-item>
         <el-form-item label="Operating System" prop="operating_system">
-          <el-input v-model="workstationForm.operating_system" />
+          <!-- <el-input v-model="workstationForm.operating_system" /> -->
+          <el-select v-model="workstationForm.operating_system" filterable placeholder="Select windows">
+            <el-option label="Windows 11" value="Windows 11" />
+            <el-option label="Windows 10" value="Windows 10" />
+            <el-option label="Windows 8" value="Windows 8" />
+            <el-option label="Windows 7" value="Windows 7" />
+          </el-select>
         </el-form-item>
         <el-form-item label="Manufacturer" prop="manufacturer_id">
           <el-select v-model="workstationForm.manufacturer_id" filterable placeholder="Select manufacturer">
@@ -172,7 +178,7 @@ export default {
         processor_specifications: [{ required: true, message: 'Please enter processor', trigger: 'blur' }],
         ram: [{ required: true, message: 'Please select RAM', trigger: 'change' }],
         harddisk_capacity: [{ required: true, message: 'Please select hard disk', trigger: 'change' }],
-        operating_system: [{ required: true, message: 'Please enter operating system', trigger: 'blur' }],
+        operating_system: [{ required: true, message: 'Please select operating system', trigger: 'blur' }],
         manufacturer_id: [{ required: true, message: 'Please select manufacturer', trigger: 'change' }],
         model: [{ required: true, message: 'Please enter model', trigger: 'blur' }],
         year: [{ required: true, message: 'Please enter year', trigger: 'blur' }],
@@ -184,7 +190,7 @@ export default {
       currentPage: 1,
       pageSize: 5,
       ramOptions: ['4 GB', '8 GB', '12 GB', '16 GB', '32 GB', '64 GB', '128 GB'],
-      hardDiskOptions: ['128 GB', '256 GB', '512 GB', '1 TB', '2 TB', '4 TB', '8 TB']
+      hardDiskOptions: ['128 GB', '256 GB', '512 GB', '1 TB', '2 TB', '4 TB', '8 TB', '> 8 TB']
     }
   },
   computed: {
