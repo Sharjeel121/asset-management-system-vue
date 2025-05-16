@@ -50,7 +50,15 @@
     <el-dialog :title="dialogTitle" v-model="dialogVisible" width="600px">
       <el-form ref="productForm" :model="productForm" :rules="rules" label-width="170px">
         <el-form-item label="Description" prop="description">
-          <el-input v-model="productForm.description" />
+          <!-- <el-input v-model="productForm.description" /> -->
+          <el-autocomplete
+          v-model="productForm.description"
+          :fetch-suggestions="querySearchAsync"
+          placeholder="Type to search existing products"
+          @select="handleDescriptionSelect"
+          clearable
+          class="full-width"
+        />
         </el-form-item>
         <el-form-item label="Manufacturer" prop="manufacturer_id">
           <el-select v-model="productForm.manufacturer_id" filterable placeholder="Select manufacturer">
@@ -174,6 +182,38 @@ export default {
     }
   },
   methods: {
+    querySearchAsync(queryString, cb) {
+    const results = queryString
+      ? this.products.filter(product => 
+          product.description.toLowerCase().includes(queryString.toLowerCase())
+        )
+      : this.products;
+    
+    const suggestions = results.map(product => ({
+      value: product.description,
+      item: product
+    }));
+    
+    cb(suggestions);
+  },
+
+  handleDescriptionSelect(data) {
+    const product = data.item;
+    // Fill all fields except reference_number and quantity
+    this.productForm = {
+      ...this.productForm,
+      description: product.description,
+      manufacturer_id: product.manufacturer_id,
+      function: product.function,
+      lifecycle_stage: product.lifecycle_stage,
+      supplier: product.supplier,
+      control_cabinet_id: product.control_cabinet_id,
+      production_site_id: product.production_site_id,
+      // Keep these empty/default
+      reference_number: '',
+      quantity: 0
+    };
+  },
     async fetchProducts() {
       this.loading = true
       try {
