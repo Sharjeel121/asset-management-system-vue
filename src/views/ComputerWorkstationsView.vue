@@ -12,6 +12,28 @@
         </el-button>
       </div>
       <div class="right-actions">
+        <span>Filters:</span>
+        <el-select v-model="filterManufacturer" placeholder="Manufacturer" size="medium" class="filter-select">
+          <el-option label="All" value="all" />
+          <el-option v-for="m in manufacturers" :key="m.id" :label="m.manufacturer_name" :value="m.id" />
+        </el-select>
+        <el-select v-model="filterSupplier" placeholder="Supplier" size="medium" class="filter-select">
+          <el-option label="All" value="all" />
+          <el-option label="CSI" value="CSI" />
+          <el-option label="CLIENT" value="CLIENT" />
+        </el-select>
+        <el-select v-model="filterType" placeholder="Type" size="medium" class="filter-select">
+          <el-option label="All" value="all" />
+          <el-option label="Server" value="Server" />
+          <el-option label="Workstation" value="Workstation" />
+        </el-select>
+        <el-select v-model="filterOS" placeholder="Operating System" size="medium" class="filter-select">
+          <el-option label="All" value="all" />
+          <el-option label="Windows 11" value="Windows 11" />
+          <el-option label="Windows 10" value="Windows 10" />
+          <el-option label="Windows 8" value="Windows 8" />
+          <el-option label="Windows 7" value="Windows 7" />
+        </el-select>
         <el-input v-model="search" placeholder="Search..." size="medium" class="search-input" clearable />
       </div>
     </div>
@@ -190,6 +212,10 @@ export default {
       search: '',
       currentPage: 1,
       pageSize: 5,
+      filterManufacturer: 'all',
+      filterSupplier: 'all',
+      filterType: 'all',
+      filterOS: 'all',
       ramOptions: ['4 GB', '8 GB', '12 GB', '16 GB', '32 GB', '64 GB', '128 GB'],
       hardDiskOptions: ['128 GB', '256 GB', '512 GB', '1 TB', '2 TB', '4 TB', '8 TB', '> 8 TB']
     }
@@ -199,12 +225,38 @@ export default {
       return this.isEdit ? 'Edit Workstation' : 'Add New Workstation'
     },
     filteredWorkstations() {
-      if (!this.search) return this.workstations
-      return this.workstations.filter(workstation =>
-        workstation.workstation_id.toLowerCase().includes(this.search.toLowerCase()) ||
-        workstation.description.toLowerCase().includes(this.search.toLowerCase()) ||
-        workstation.production_site.site_name.toLowerCase().includes(this.search.toLowerCase())
-      )
+      let filtered = this.workstations
+
+      // Apply search filter
+      if (this.search) {
+        filtered = filtered.filter(workstation =>
+          workstation.workstation_id.toLowerCase().includes(this.search.toLowerCase()) ||
+          workstation.description.toLowerCase().includes(this.search.toLowerCase()) ||
+          workstation.production_site.site_name.toLowerCase().includes(this.search.toLowerCase())
+        )
+      }
+
+      // Apply manufacturer filter
+      if (this.filterManufacturer !== 'all') {
+        filtered = filtered.filter(workstation => workstation.manufacturer_id === this.filterManufacturer)
+      }
+
+      // Apply supplier filter
+      if (this.filterSupplier !== 'all') {
+        filtered = filtered.filter(workstation => workstation.supplier === this.filterSupplier)
+      }
+
+      // Apply type filter
+      if (this.filterType !== 'all') {
+        filtered = filtered.filter(workstation => workstation.type === this.filterType)
+      }
+
+      // Apply OS filter
+      if (this.filterOS !== 'all') {
+        filtered = filtered.filter(workstation => workstation.operating_system === this.filterOS)
+      }
+
+      return filtered
     },
     pagedWorkstations() {
       const start = (this.currentPage - 1) * this.pageSize
@@ -378,6 +430,10 @@ export default {
   display: flex;
   gap: 10px;
   align-items: center;
+  flex-wrap: wrap;
+  span {
+    color: black;
+  }
 }
 
 .search-input {
@@ -398,5 +454,9 @@ export default {
   display: flex;
   justify-content: flex-end;
   margin-top: 16px;
+}
+
+.filter-select {
+  width: 140px;
 }
 </style> 

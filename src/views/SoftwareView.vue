@@ -12,6 +12,26 @@
         </el-button>
       </div>
       <div class="right-actions">
+        <span>Filters:</span>
+        <el-select v-model="filterManufacturer" placeholder="Manufacturer" size="medium" class="filter-select">
+          <el-option label="All" value="all" />
+          <el-option v-for="m in manufacturers" :key="m.id" :label="m.manufacturer_name" :value="m.id" />
+        </el-select>
+        <el-select v-model="filterSupplier" placeholder="Supplier" size="medium" class="filter-select">
+          <el-option label="All" value="all" />
+          <el-option label="CSI" value="CSI" />
+          <el-option label="CLIENT" value="CLIENT" />
+        </el-select>
+        <el-select v-model="filterFunction" placeholder="Function" size="medium" class="filter-select">
+          <el-option label="All" value="all" />
+          <el-option label="SCADA" value="SCADA" />
+          <el-option label="HMI" value="HMI" />
+          <el-option label="PLC Programming" value="PLC Programming" />
+          <el-option label="MES" value="MES" />
+          <el-option label="Database" value="Database" />
+          <el-option label="Client Supervision" value="Client Supervision" />
+          <el-option label="Other" value="Other" />
+        </el-select>
         <el-input v-model="search" placeholder="Search..." size="medium" class="search-input" clearable />
       </div>
     </div>
@@ -149,7 +169,10 @@ export default {
       },
       search: '',
       currentPage: 1,
-      pageSize: 5
+      pageSize: 5,
+      filterManufacturer: 'all',
+      filterSupplier: 'all',
+      filterFunction: 'all'
     }
   },
   computed: {
@@ -157,12 +180,33 @@ export default {
       return this.isEdit ? 'Edit Software' : 'Add New Software'
     },
     filteredSoftware() {
-      if (!this.search) return this.softwareList
-      return this.softwareList.filter(item =>
-        (item.software_name && item.software_name.toLowerCase().includes(this.search.toLowerCase())) ||
-        (item.manufacturer && item.manufacturer.manufacturer_name && item.manufacturer.manufacturer_name.toLowerCase().includes(this.search.toLowerCase())) ||
-        (item.production_site && item.production_site.site_name && item.production_site.site_name.toLowerCase().includes(this.search.toLowerCase()))
-      )
+      let filtered = this.softwareList
+
+      // Apply search filter
+      if (this.search) {
+        filtered = filtered.filter(item =>
+          (item.software_name && item.software_name.toLowerCase().includes(this.search.toLowerCase())) ||
+          (item.manufacturer && item.manufacturer.manufacturer_name && item.manufacturer.manufacturer_name.toLowerCase().includes(this.search.toLowerCase())) ||
+          (item.production_site && item.production_site.site_name && item.production_site.site_name.toLowerCase().includes(this.search.toLowerCase()))
+        )
+      }
+
+      // Apply manufacturer filter
+      if (this.filterManufacturer !== 'all') {
+        filtered = filtered.filter(item => item.manufacturer_id === this.filterManufacturer)
+      }
+
+      // Apply supplier filter
+      if (this.filterSupplier !== 'all') {
+        filtered = filtered.filter(item => item.supplier === this.filterSupplier)
+      }
+
+      // Apply function filter
+      if (this.filterFunction !== 'all') {
+        filtered = filtered.filter(item => item.function === this.filterFunction)
+      }
+
+      return filtered
     },
     pagedSoftware() {
       const start = (this.currentPage - 1) * this.pageSize
@@ -344,5 +388,17 @@ export default {
   display: flex;
   justify-content: flex-end;
   margin-top: 16px;
+}
+.right-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  span {
+    color: black;
+  }
+}
+.filter-select {
+  width: 140px;
 }
 </style> 

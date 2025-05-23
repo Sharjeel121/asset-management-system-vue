@@ -12,6 +12,33 @@
         </el-button>
       </div>
       <div class="right-actions">
+        <span>Filters:</span>
+        <el-select v-model="filterManufacturer" placeholder="Manufacturer" size="medium" class="filter-select">
+          <el-option label="All" value="all" />
+          <el-option v-for="m in manufacturers" :key="m.id" :label="m.manufacturer_name" :value="m.id" />
+        </el-select>
+        <el-select v-model="filterSupplier" placeholder="Supplier" size="medium" class="filter-select">
+          <el-option label="All" value="all" />
+          <el-option label="CSI" value="CSI" />
+          <el-option label="CLIENT" value="CLIENT" />
+        </el-select>
+        <el-select v-model="filterFunction" placeholder="Function" size="medium" class="filter-select">
+          <el-option label="All" value="all" />
+          <el-option label="CPU controller" value="CPU controller" />
+          <el-option label="I/O module" value="I/O module" />
+          <el-option label="Power supply" value="Power supply" />
+          <el-option label="Accessory" value="Accessory" />
+          <el-option label="FTA" value="FTA" />
+          <el-option label="Connector" value="Connector" />
+          <el-option label="Switch" value="Switch" />
+          <el-option label="Other" value="Other" />
+        </el-select>
+        <el-select v-model="filterLifecycle" placeholder="Lifecycle" size="medium" class="filter-select">
+          <el-option label="All" value="all" />
+          <el-option label="Obsolete" value="Obsolete" />
+          <el-option label="Active" value="Active" />
+          <el-option label="Mature" value="Mature" />
+        </el-select>
         <el-input v-model="search" placeholder="Search..." size="medium" class="search-input" clearable />
       </div>
     </div>
@@ -163,7 +190,11 @@ export default {
       },
       search: '',
       currentPage: 1,
-      pageSize: 5
+      pageSize: 5,
+      filterManufacturer: 'all',
+      filterSupplier: 'all',
+      filterFunction: 'all',
+      filterLifecycle: 'all'
     }
   },
   computed: {
@@ -171,11 +202,37 @@ export default {
       return this.isEdit ? 'Edit Product' : 'Add New Product'
     },
     filteredProducts() {
-      if (!this.search) return this.products
-      return this.products.filter(product =>
-        product.description.toLowerCase().includes(this.search.toLowerCase()) ||
-        (product.manufacturer && product.manufacturer.manufacturer_name && product.manufacturer.manufacturer_name.toLowerCase().includes(this.search.toLowerCase()))
-      )
+      let filtered = this.products
+
+      // Apply search filter
+      if (this.search) {
+        filtered = filtered.filter(product =>
+          product.description.toLowerCase().includes(this.search.toLowerCase()) ||
+          (product.manufacturer && product.manufacturer.manufacturer_name && product.manufacturer.manufacturer_name.toLowerCase().includes(this.search.toLowerCase()))
+        )
+      }
+
+      // Apply manufacturer filter
+      if (this.filterManufacturer !== 'all') {
+        filtered = filtered.filter(product => product.manufacturer_id === this.filterManufacturer)
+      }
+
+      // Apply supplier filter
+      if (this.filterSupplier !== 'all') {
+        filtered = filtered.filter(product => product.supplier === this.filterSupplier)
+      }
+
+      // Apply function filter
+      if (this.filterFunction !== 'all') {
+        filtered = filtered.filter(product => product.function === this.filterFunction)
+      }
+
+      // Apply lifecycle filter
+      if (this.filterLifecycle !== 'all') {
+        filtered = filtered.filter(product => product.lifecycle_stage === this.filterLifecycle)
+      }
+
+      return filtered
     },
     pagedProducts() {
       const start = (this.currentPage - 1) * this.pageSize
@@ -380,6 +437,10 @@ export default {
   display: flex;
   gap: 10px;
   align-items: center;
+  flex-wrap: wrap;
+  span {
+    color: black;
+  }
 }
 .search-input {
   width: 200px;
@@ -396,5 +457,8 @@ export default {
   display: flex;
   justify-content: flex-end;
   margin-top: 16px;
+}
+.filter-select {
+  width: 140px;
 }
 </style> 
