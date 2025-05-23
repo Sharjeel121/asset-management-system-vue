@@ -113,6 +113,7 @@ import { useManufacturersStore } from '@/stores/manufacturers'
 import { useProductionSitesStore } from '@/stores/productionSites'
 import { useComputerWorkstationsStore } from '@/stores/computerWorkstations'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import appRequest from '@/helpers/request'
 
 export default {
   name: 'SoftwareView',
@@ -246,8 +247,21 @@ export default {
       }
       this.dialogVisible = true
     },
-    exportSoftware() {
-      ElMessage.success('Exported software!') // Placeholder
+    async exportSoftware() {
+      try {
+        let response = await appRequest.get('/report/softwares/export/csv')
+        console.log("🚀 ~ exportProducts ~ response:", response)
+        let blob = new Blob([response], { type: 'text/csv' })
+        let url = window.URL.createObjectURL(blob)
+        let a = document.createElement('a')
+        a.href = url
+        a.download = 'softwares.csv'
+        a.click()
+        
+        ElMessage.success('Exported software!') // Placeholder
+      } catch (error) {
+          console.log(error);
+      };
     },
     async handleSubmit() {
       if (!this.$refs.softwareForm) return

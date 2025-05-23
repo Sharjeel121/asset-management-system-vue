@@ -8,10 +8,10 @@
           <el-icon><plus /></el-icon>
           New Client
         </el-button>
-        <el-button @click="exportClients">
+        <!-- <el-button @click="exportClients">
           <el-icon><download /></el-icon>
           Export
-        </el-button>
+        </el-button> -->
       </div>
       <div class="right-actions ">
         <el-input v-model="search" placeholder="Search..." size="medium" class="search-input" clearable />

@@ -82,10 +82,10 @@
             <el-icon><data-line /></el-icon>
             <span>Software</span>
           </el-menu-item>
-          <el-menu-item index="/reports">
+          <!-- <el-menu-item index="/reports">
             <el-icon><document /></el-icon>
             <span>Reports</span>
-          </el-menu-item>
+          </el-menu-item> -->
         </el-menu>
       </el-aside>
       <el-main>

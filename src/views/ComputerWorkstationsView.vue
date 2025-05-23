@@ -144,6 +144,7 @@ import { useComputerWorkstationsStore } from '@/stores/computerWorkstations'
 import { useProductionSitesStore } from '@/stores/productionSites'
 import { useManufacturersStore } from '@/stores/manufacturers'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import appRequest from '@/helpers/request'
 
 export default {
   name: 'ComputerWorkstationsView',
@@ -287,8 +288,22 @@ export default {
       }
       this.dialogVisible = true
     },
-    exportWorkstations() {
-      ElMessage.success('Exported workstations!')
+    async exportWorkstations() {
+      try {
+        let response = await appRequest.get('/report/workstations/export/csv')
+        console.log("🚀 ~ exportProducts ~ response:", response)
+        let blob = new Blob([response], { type: 'text/csv' })
+        let url = window.URL.createObjectURL(blob)
+        let a = document.createElement('a')
+        a.href = url
+        a.download = 'workstations.csv'
+        a.click()
+        
+        ElMessage.success('Exported workstations!')
+      } catch (error) {
+          console.log(error);
+      };
+      
     },
     async handleSubmit() {
       if (!this.$refs.workstationForm) return

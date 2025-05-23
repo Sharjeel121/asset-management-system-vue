@@ -6,10 +6,10 @@
           <el-icon><plus /></el-icon>
           New Production Site
         </el-button>
-        <el-button @click="exportSites">
+        <!-- <el-button @click="exportSites">
           <el-icon><download /></el-icon>
           Export
-        </el-button>
+        </el-button> -->
       </div>
       <div class="right-actions">
         <el-input v-model="search" placeholder="Search..." size="medium" class="search-input" clearable />

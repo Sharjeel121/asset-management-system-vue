@@ -26,7 +26,7 @@
         <el-table-column prop="lifecycle_stage" label="Lifecycle Stage" />
         <el-table-column prop="supplier" label="Supplier" />
         <el-table-column prop="control_cabinet.cabinet_id" label="Control Cabinet" />
-        <el-table-column prop="production_site.site_name" label="Production Site" />
+        <el-table-column prop="production_site.site_name" label="Production Site" min-width="120" />
         <el-table-column label="Actions" width="140">
           <template #default="scope">
             <el-button-group>
@@ -124,6 +124,7 @@ import { useAutomationProductsStore } from '@/stores/automationProducts'
 import { useManufacturersStore } from '@/stores/manufacturers'
 import { useProductionSitesStore } from '@/stores/productionSites'
 import { useControlCabinetsStore } from '@/stores/controlCabinets'
+import appRequest from '@/helpers/request'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 export default {
@@ -293,8 +294,22 @@ export default {
       }
       this.dialogVisible = true
     },
-    exportProducts() {
-      ElMessage.success('Exported products!')
+    async exportProducts() {
+      try {
+        let response = await appRequest.get('/report/automation-products/export/csv')
+        console.log("🚀 ~ exportProducts ~ response:", response)
+        let blob = new Blob([response], { type: 'text/csv' })
+        let url = window.URL.createObjectURL(blob)
+        let a = document.createElement('a')
+        a.href = url
+        a.download = 'automation-products.csv'
+        a.click()
+        
+        ElMessage.success('Exported products!')
+      } catch (error) {
+          console.log(error);
+      };
+      
     },
     async handleSubmit() {
       if (!this.$refs.productForm) return

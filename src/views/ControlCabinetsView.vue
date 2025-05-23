@@ -6,10 +6,10 @@
           <el-icon><plus /></el-icon>
           Add New Cabinet
         </el-button>
-        <el-button @click="exportCabinets">
+        <!-- <el-button @click="exportCabinets">
           <el-icon><download /></el-icon>
           Export
-        </el-button>
+        </el-button> -->
       </div>
       <div class="right-actions">
         <el-input v-model="search" placeholder="Search..." size="medium" class="search-input" clearable />
