@@ -5,7 +5,7 @@
       <template #header>
         
         <div class="card-header">
-          <img src="/public/logo.png" alt="AMS" height="100px" />
+          <img src="/logo.png" alt="AMS" height="100px" />
           <!-- <h2>Asset Management System</h2> -->
           <p>Industrial Automation Asset Management</p>
         </div>

@@ -45,14 +45,6 @@ The sidebar navigation adapts based on the logged-in user's role:
 - **Admin**: Sees all modules, including User Management
 - **Company**: Sees only business modules (no User Management)
 
-## Login Credentials (for testing)
-
-- **Admin**
-  - Email: `admin@example.com`
-  - Password: any
-- **Company**
-  - Email: `company@example.com`
-  - Password: any
 
 ## Notes
 - The navigation and module access are dynamically controlled using the user's role and permissions.

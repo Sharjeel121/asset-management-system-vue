@@ -8,7 +8,7 @@
             <el-icon  v-else><Fold /></el-icon>
           </button>
           <!-- <h1>AMS</h1> -->
-           <img src="/public/logo.png" alt="AMS" height="50px" />
+           <img src="/logo.png" alt="AMS" height="50px" />
         </div>
         <el-dropdown>
           <span class="user-dropdown">
